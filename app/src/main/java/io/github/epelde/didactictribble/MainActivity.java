@@ -1,9 +1,9 @@
 package io.github.epelde.didactictribble;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -33,22 +33,31 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private class GenerateTicketTask extends AsyncTask<Void, Void, Void> {
+    private void displayTicket(Ticket ticket) {
+        Intent intent = new Intent(this, TicketActivity.class);
+        intent.putExtra("TICKET", ticket);
+        startActivity(intent);
+    }
+
+    private class GenerateTicketTask extends AsyncTask<Void, Void, Ticket> {
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Ticket doInBackground(Void... params) {
             Service client = GenerateTicketClient.createService(Service.class);
             Call<GenerateTicketResponse> call = client.generateTicket();
             Response<GenerateTicketResponse> apiResponse = null;
             try {
                 apiResponse = call.execute();
-                Log.i("XXX", "***CODE:" + apiResponse.code());
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
             }
-            GenerateTicketResponse response = apiResponse.body();
-            Log.i("XXX", "***TICKETS:" + response.getTickets().size());
-            return null;
+            return apiResponse.body().getTickets().get(0);
+        }
+
+        @Override
+        protected void onPostExecute(Ticket t) {
+            super.onPostExecute(t);
+            displayTicket(t);
         }
     }
 }

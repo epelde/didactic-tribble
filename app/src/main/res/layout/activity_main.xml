@@ -21,20 +21,6 @@
             android:layout_height="wrap_content"
             android:text="@string/button_generate_ticket_text" />
 
-        <Button
-            android:id="@+id/check_ticket_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/button_check_ticket_text" />
-
-        <Button
-            android:id="@+id/configuration_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/button_configuration_text" />
-
     </LinearLayout>
 
 </RelativeLayout>

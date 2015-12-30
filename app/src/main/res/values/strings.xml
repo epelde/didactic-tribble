@@ -1,9 +1,7 @@
 <resources>
     <!-- Activities -->
     <string name="app_name">Prototipo</string>
-
     <!-- Buttons -->
     <string name="button_generate_ticket_text">Generar ticket</string>
-    <string name="button_check_ticket_text">Comprobar ticket</string>
-    <string name="button_configuration_text">Configuración</string>
+    <string name="button_print_ticket_text">Imprimir ticket</string>
 </resources>
