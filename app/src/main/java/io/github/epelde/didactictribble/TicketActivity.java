@@ -10,12 +10,16 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 /**
  * Created by epelde on 30/12/2015.
  */
 public class TicketActivity extends AppCompatActivity {
 
     private Ticket ticket;
+    private TextView mDate;
     private TextView mBusinessName;
     private TextView mBusinessAddress;
     private TextView mDescription;
@@ -28,6 +32,9 @@ public class TicketActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ticket);
         ticket = (Ticket) getIntent().getSerializableExtra("TICKET");
+        mDate = (TextView) findViewById(R.id.date_text_view);
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", new Locale("es", "ES"));
+        mDate.setText(df.format(ticket.getDate()));
         mBusinessName = (TextView) findViewById(R.id.business_name_text_view);
         mBusinessName.setText(ticket.getBusinessName());
         mBusinessAddress = (TextView) findViewById(R.id.business_address_text_view);

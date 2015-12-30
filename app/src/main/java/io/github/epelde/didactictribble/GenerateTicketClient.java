@@ -1,5 +1,6 @@
 package io.github.epelde.didactictribble;
 
+import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
 
 import retrofit.GsonConverterFactory;
@@ -15,7 +16,11 @@ public class GenerateTicketClient {
 
     private static Retrofit.Builder builder = new Retrofit.Builder()
             .baseUrl(API_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create());
+            .addConverterFactory(GsonConverterFactory.create(
+                    new GsonBuilder().setDateFormat("MM/dd/yyyy HH:mm:ss a")
+                            .create()
+
+            ));
 
     public static <S> S createService(Class<S> serviceClass) {
         Retrofit retrofit = builder.client(httpClient).build();
