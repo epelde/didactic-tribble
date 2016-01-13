@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private final static int REQUEST_ENABLE_BT = 1;
 
     private Button mGenerateTicketButton;
-    private BluetoothAdapter btAdapter;
+    private BluetoothAdapter bluetoohAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +57,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkBluetoohEnabled() {
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            btAdapter = ((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE))
+            bluetoohAdapter = ((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE))
                     .getAdapter();
-            if (btAdapter != null) {
-                if (!btAdapter.isEnabled()) {
+            if (bluetoohAdapter != null) {
+                if (!bluetoohAdapter.isEnabled()) {
                     Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
                 } else {
