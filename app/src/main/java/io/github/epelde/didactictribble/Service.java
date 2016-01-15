@@ -8,7 +8,7 @@ import retrofit.http.GET;
  */
 public interface Service {
 
-    @GET("/generar_ticket.asp?Pais=ES&Codigo=480010001&Clave=xxxxx&Idioma=ES")
+    @GET("/generar_ticket.asp?Pais=ES&Codigo=480040010001&Clave=5714&Idioma=ES")
     Call<GenerateTicketResponse> generateTicket();
 
 }

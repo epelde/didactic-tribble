@@ -9,5 +9,5 @@
     <!-- Messages -->
     <string name="msg_bluetooh_not_supported">Bluetooh no soportado por el dispositivo</string>
     <string name="msg_bluetooh_not_enabled">Es necesario activar el Bluetooh para poder generar e imprimir tickets</string>
-    <string name="msg_bluetooh_adapter_available">Adaptador de Bluetooh no disponible en el dispositivo</string>
+    <string name="msg_bluetooh_adapter_not_available">Adaptador de Bluetooh no disponible en el dispositivo</string>
 </resources>

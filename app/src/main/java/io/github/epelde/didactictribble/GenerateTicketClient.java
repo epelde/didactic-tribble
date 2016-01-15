@@ -11,7 +11,7 @@ import retrofit.Retrofit;
  */
 public class GenerateTicketClient {
 
-    private static final String API_BASE_URL = "http://www.kobazulo.net/";
+    private static final String API_BASE_URL = "http://www.kobazulo.net/clientes/fidelizacion";
     private static OkHttpClient httpClient = new OkHttpClient();
 
     private static Retrofit.Builder builder = new Retrofit.Builder()

@@ -56,16 +56,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:textColor="#000000"
-            android:textSize="16dp"
+            android:paddingBottom="56dp"
             android:paddingTop="8dp"
-            android:paddingBottom="56dp"/>
+            android:textColor="#000000"
+            android:textSize="16dp" />
 
         <Button
             android:id="@+id/print_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/button_print_ticket_text" />
+            android:text="@string/button_print_ticket_text"
+            android:visibility="invisible" />
 
     </LinearLayout>
 </RelativeLayout>
