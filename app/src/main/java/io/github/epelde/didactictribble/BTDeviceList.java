@@ -45,12 +45,8 @@ public class BTDeviceList extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle("Bluetooth Devices");
-        try {
-            if (initDevicesList() != 0) {
-                this.finish();
-                return;
-            }
-        } catch (Exception ex) {
+        // if there is any error wih the Bluetooth the activity is finished!
+        if (initDevicesList() != 0) {
             this.finish();
             return;
         }
