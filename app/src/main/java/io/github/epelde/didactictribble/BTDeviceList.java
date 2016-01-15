@@ -1,8 +1,5 @@
 package io.github.epelde.didactictribble;
 
-/**
- * Created by epelde on 15/01/2016.
- */
 import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -23,6 +20,10 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
+
+/**
+ * Created by epelde on 15/01/2016.
+ */
 public class BTDeviceList extends ListActivity {
 
     static public final int REQUEST_CONNECT_BT = 0x2300;
@@ -35,34 +36,25 @@ public class BTDeviceList extends ListActivity {
 
     static private ArrayAdapter<BluetoothDevice> btDevices = null;
 
-    private static final UUID SPP_UUID = UUID
-            .fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
-// UUID.fromString(“00001101-0000-1000-8000-00805F9B34FB”);
+    private static final UUID SPP_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+    // UUID.fromString(“00001101-0000-1000-8000-00805F9B34FB”);
 
     static private BluetoothSocket mbtSocket = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setTitle("Bluetooth Devices");
-
         try {
             if (initDevicesList() != 0) {
                 this.finish();
                 return;
             }
-
         } catch (Exception ex) {
             this.finish();
             return;
         }
-        Log.i("ZZZ", "1");
-        IntentFilter btIntentFilter = new IntentFilter(
-                BluetoothDevice.ACTION_FOUND);
-        Log.i("ZZZ", "2");
-        registerReceiver(mBTReceiver, btIntentFilter);
-        Log.i("ZZZ", "3");
+        registerReceiver(mBTReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
     }
 
     public static BluetoothSocket getSocket() {
@@ -180,26 +172,18 @@ public class BTDeviceList extends ListActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i("ZZZ", "Broadcasting receive");
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+            Log.i(">>>", "Broadcast Action: Remote device discovered.");
+            if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
                 BluetoothDevice device = intent
                         .getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
-                try {
-                    if (btDevices == null) {
-                        btDevices = new ArrayAdapter<BluetoothDevice>(
-                                getApplicationContext(), android.R.layout.simple_list_item_1);
-                    }
-
-                    if (btDevices.getPosition(device) < 0) {
-                        btDevices.add(device);
-                        mArrayAdapter.add(device.getName() + "\n"
-                                + device.getAddress() + "\n" );
-                        mArrayAdapter.notifyDataSetInvalidated();
-                    }
-                } catch (Exception ex) {
-                    // ex.fillInStackTrace();
+                if (btDevices == null) {
+                    btDevices = new ArrayAdapter<BluetoothDevice>(
+                            getApplicationContext(), android.R.layout.simple_list_item_1);
+                }
+                if (btDevices.getPosition(device) < 0) {
+                    btDevices.add(device);
+                    mArrayAdapter.add(device.getName() + "\n" + device.getAddress() + "\n" );
+                    mArrayAdapter.notifyDataSetInvalidated();
                 }
             }
         }
