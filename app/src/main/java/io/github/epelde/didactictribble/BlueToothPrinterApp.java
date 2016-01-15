@@ -1,8 +1,5 @@
 package io.github.epelde.didactictribble;
 
-/**
- * Created by epelde on 15/01/2016.
- */
 import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
@@ -14,6 +11,11 @@ import android.widget.EditText;
 
 import java.io.IOException;
 import java.io.OutputStream;
+
+/**
+ * https://overglobe.wordpress.com/2013/12/27/android-bluetooth-printer/
+ * Created by epelde on 15/01/2016.
+ */
 public class BlueToothPrinterApp extends Activity
 {
     /** Called when the activity is first created. */
