@@ -91,10 +91,9 @@ public class BTDeviceList extends ListActivity {
         }
 
     }
+
     private int initDevicesList() {
-
         flushData();
-
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Toast.makeText(getApplicationContext(),
@@ -124,7 +123,6 @@ public class BTDeviceList extends ListActivity {
                 .show();
 
         return 0;
-
     }
 
     @Override
@@ -169,7 +167,6 @@ public class BTDeviceList extends ListActivity {
     }
 
     private final BroadcastReceiver mBTReceiver = new BroadcastReceiver() {
-
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i(">>>", "Broadcast Action: Remote device discovered.");
