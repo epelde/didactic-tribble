@@ -1,5 +1,6 @@
 package io.github.epelde.didactictribble;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -17,9 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Created by epelde on 15/01/2016.
@@ -36,7 +35,7 @@ public class BTDeviceList extends ListActivity {
 
     static private ArrayAdapter<BluetoothDevice> btDevices = null;
 
-    private static final UUID SPP_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+    //private static final UUID SPP_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
     // UUID.fromString(“00001101-0000-1000-8000-00805F9B34FB”);
 
     static private BluetoothSocket mbtSocket = null;
@@ -130,21 +129,18 @@ public class BTDeviceList extends ListActivity {
     @Override
     protected void onActivityResult(int reqCode, int resultCode, Intent intent) {
         super.onActivityResult(reqCode, resultCode, intent);
-        Log.i("ZZZ", "onActivityResult");
+        Log.i(">>>", "onActivityResult");
         switch (reqCode) {
             case REQUEST_ENABLE_BT:
-
                 if (resultCode == RESULT_OK) {
                     Set<BluetoothDevice> btDeviceList = mBluetoothAdapter
                             .getBondedDevices();
                     try {
+                        Log.i(">>>", "Device List:" + btDeviceList);
                         if (btDeviceList.size() > 0) {
-
                             for (BluetoothDevice device : btDeviceList) {
                                 if (btDeviceList.contains(device) == false) {
-
                                     btDevices.add(device);
-
                                     mArrayAdapter.add(device.getName() + "\n"
                                             + device.getAddress());
                                     mArrayAdapter.notifyDataSetInvalidated();
@@ -154,12 +150,9 @@ public class BTDeviceList extends ListActivity {
                     } catch (Exception ex) {
                     }
                 }
-
                 break;
         }
-
         mBluetoothAdapter.startDiscovery();
-
     }
 
     private final BroadcastReceiver mBTReceiver = new BroadcastReceiver() {
@@ -178,15 +171,14 @@ public class BTDeviceList extends ListActivity {
                     mArrayAdapter.add(device.getName() + "\n" + device.getAddress() + "\n" );
                     mArrayAdapter.notifyDataSetInvalidated();
                 }
+                Log.i(">>>", "Devices found:" + btDevices.getCount());
             }
         }
     };
 
     @Override
-    protected void onListItemClick(ListView l, View v, final int position,
-                                   long id) {
+    protected void onListItemClick(ListView l, View v, final int position, long id) {
         super.onListItemClick(l, v, position, id);
-
         if (mBluetoothAdapter == null) {
             return;
         }
@@ -195,31 +187,34 @@ public class BTDeviceList extends ListActivity {
             mBluetoothAdapter.cancelDiscovery();
         }
 
-        Toast.makeText(
-                getApplicationContext(),
-                "Connecting to " + btDevices.getItem(position).getName() + ","
-        + btDevices.getItem(position).getAddress(),
-                Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(),"Connecting to " + btDevices.getItem(position).getName() + ","
+            + btDevices.getItem(position).getAddress(), Toast.LENGTH_SHORT).show();
 
-        Thread connectThread = new Thread(new Runnable() {
+        //Thread connectThread = new Thread(new Runnable() {
 
-            @Override
-            public void run() {
-                try {
-                    boolean gotuuid = btDevices.getItem(position)
-                            .fetchUuidsWithSdp();
-                    UUID uuid = btDevices.getItem(position).getUuids()[0]
-                            .getUuid();
-                    mbtSocket = btDevices.getItem(position)
-                            .createRfcommSocketToServiceRecord(uuid);
+            //@Override
+            //public void run() {
+                //try {
+                    //boolean gotuuid = btDevices.getItem(position)
+                    //        .fetchUuidsWithSdp();
+                    //UUID uuid = btDevices.getItem(position).getUuids()[0].getUuid();
+                    //Log.i(">>>", "Connecting...");
+                    //Log.i(">>>", "UUID:" + uuid.toString());
+                    Log.i(">>>", "Devices found(2):" + btDevices.getCount());
+                    //mbtSocket = btDevices.getItem(position)
+                    //        .createRfcommSocketToServiceRecord(uuid);
+                    //mbtSocket.connect();
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("DEVICE", btDevices.getItem(position));
+                    setResult(Activity.RESULT_OK, resultIntent);
+                    finish();
 
-                    mbtSocket.connect();
-                } catch (IOException ex) {
+                /*} catch (IOException ex) {
                     runOnUiThread(socketErrorRunnable);
                     try {
                         mbtSocket.close();
                     } catch (IOException e) {
-// e.printStackTrace();
+                        // e.printStackTrace();
                     }
                     mbtSocket = null;
                     return;
@@ -228,16 +223,18 @@ public class BTDeviceList extends ListActivity {
 
                         @Override
                         public void run() {
+                            Log.i(">>>", "Finishing Activity");
                             finish();
 
                         }
                     });
                 }
-            }
-        });
+                */
+            //}
+        //});
 
-        connectThread.start();
         unregisterReceiver(mBTReceiver);
+        //connectThread.start();
     }
 
     private Runnable socketErrorRunnable = new Runnable() {
@@ -254,22 +251,18 @@ public class BTDeviceList extends ListActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-
         menu.add(0, Menu.FIRST, Menu.NONE, "Refresh Scanning");
-
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
-
         switch (item.getItemId()) {
             case Menu.FIRST:
                 initDevicesList();
                 break;
         }
-
         return true;
     }
 }

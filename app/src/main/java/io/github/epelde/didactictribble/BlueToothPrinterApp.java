@@ -1,9 +1,11 @@
 package io.github.epelde.didactictribble;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -11,6 +13,7 @@ import android.widget.EditText;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.UUID;
 
 /**
  * https://overglobe.wordpress.com/2013/12/27/android-bluetooth-printer/
@@ -47,7 +50,6 @@ public class BlueToothPrinterApp extends Activity
             this.startActivityForResult(BTIntent, BTDeviceList.REQUEST_CONNECT_BT);
         }
         else{
-
             OutputStream opstream = null;
             try {
                 opstream = btsocket.getOutputStream();
@@ -61,14 +63,37 @@ public class BlueToothPrinterApp extends Activity
 
     }
     private void print_bt() {
-        try {
-            try {
+        Thread connectThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    btoutputstream = btsocket.getOutputStream();
+                    byte[] printformat = { 0x1B, 0x21, FONT_TYPE };
+                    btoutputstream.write(printformat);
+                    String msg = message.getText().toString();
+                    btoutputstream.write(msg.getBytes());
+                    btoutputstream.write(0x0D);
+                    btoutputstream.write(0x0D);
+                    btoutputstream.write(0x0D);
+                    btoutputstream.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        connectThread.start();
+
+
+        //try {
+           /* try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-            btoutputstream = btsocket.getOutputStream();
+*/
+            /*btoutputstream = btsocket.getOutputStream();
 
             byte[] printformat = { 0x1B, 0x21, FONT_TYPE };
             btoutputstream.write(printformat);
@@ -80,7 +105,7 @@ public class BlueToothPrinterApp extends Activity
             btoutputstream.flush();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 
@@ -99,16 +124,35 @@ public class BlueToothPrinterApp extends Activity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        try {
-            btsocket = BTDeviceList.getSocket();
-            if(btsocket != null){
-                print_bt();
-            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Thread connectThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //btsocket = BTDeviceList.getSocket();
+                    Log.i(">>>", "Printing");
+                    BluetoothDevice device = (BluetoothDevice) data.getParcelableExtra("DEVICE");
+                    UUID uuid = device.getUuids()[0].getUuid();
+                    Log.i(">>>", "uuid:" + uuid.toString());
+                    btsocket = device.createRfcommSocketToServiceRecord(uuid);
+                    btsocket.connect();
+                    if(btsocket != null){
+                        print_bt();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    try {
+                        btsocket.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        connectThread.start();
     }
 }
