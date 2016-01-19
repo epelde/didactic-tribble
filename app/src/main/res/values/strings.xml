@@ -1,6 +1,7 @@
 <resources>
     <!-- Activities -->
     <string name="app_name">Prototipo</string>
+    <string name="activity_device_list">Selecciona la impresora</string>
 
     <!-- Buttons -->
     <string name="button_generate_ticket_text">Generar ticket</string>
@@ -10,4 +11,5 @@
     <string name="msg_bluetooh_not_supported">Bluetooh no soportado por el dispositivo</string>
     <string name="msg_bluetooh_not_enabled">Es necesario activar el Bluetooh para poder generar e imprimir tickets</string>
     <string name="msg_bluetooh_adapter_not_available">Adaptador de Bluetooh no disponible en el dispositivo</string>
+    <string name="msg_searching_bluetooth_devices">Buscando dispositivos Bluetooth...</string>
 </resources>

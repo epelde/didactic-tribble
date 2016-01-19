@@ -35,9 +35,6 @@ public class BTDeviceList extends ListActivity {
 
     static private ArrayAdapter<BluetoothDevice> btDevices = null;
 
-    //private static final UUID SPP_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
-    // UUID.fromString(“00001101-0000-1000-8000-00805F9B34FB”);
-
     static private BluetoothSocket mbtSocket = null;
 
     @Override

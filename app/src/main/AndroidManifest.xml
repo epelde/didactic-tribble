@@ -15,17 +15,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--
-        <activity android:name=".MainActivity" android:screenOrientation="portrait">
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".TicketActivity" android:screenOrientation="portrait" />
-        -->
+        <activity
+            android:name=".TicketActivity"
+            android:screenOrientation="portrait" />
 
+        <!--
         <activity
             android:name="BlueToothPrinterApp"
             android:label="@string/app_name">
@@ -35,6 +38,12 @@
             </intent-filter>
         </activity>
         <activity android:name="BTDeviceList"></activity>
+        -->
+
+        <activity
+            android:name=".activity.BTDeviceListActivity"
+            android:label="@string/activity_device_list"
+            android:screenOrientation="portrait"></activity>
 
     </application>
 
