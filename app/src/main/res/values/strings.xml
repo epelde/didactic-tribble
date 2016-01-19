@@ -6,6 +6,7 @@
     <!-- Buttons -->
     <string name="button_generate_ticket_text">Generar ticket</string>
     <string name="button_print_ticket_text">Imprimir ticket</string>
+    <string name="button_validate_ticket_text">Validar ticket</string>
 
     <!-- Messages -->
     <string name="msg_bluetooh_not_supported">Bluetooh no soportado por el dispositivo</string>
