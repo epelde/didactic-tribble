@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import io.github.epelde.didactictribble.R;
-import io.github.epelde.didactictribble.TicketActivity;
+import io.github.epelde.didactictribble.activity.TicketActivity;
 
 /**
  * Created by epelde on 19/01/2016.

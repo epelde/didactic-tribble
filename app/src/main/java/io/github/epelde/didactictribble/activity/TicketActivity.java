@@ -1,4 +1,4 @@
-package io.github.epelde.didactictribble;
+package io.github.epelde.didactictribble.activity;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -20,6 +20,11 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
+import io.github.epelde.didactictribble.GenerateTicketClient;
+import io.github.epelde.didactictribble.GenerateTicketResponse;
+import io.github.epelde.didactictribble.R;
+import io.github.epelde.didactictribble.Service;
+import io.github.epelde.didactictribble.Ticket;
 import retrofit.Call;
 import retrofit.Response;
 
