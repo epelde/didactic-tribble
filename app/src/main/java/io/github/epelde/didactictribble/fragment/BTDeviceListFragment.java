@@ -19,19 +19,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.epelde.didactictribble.R;
+import io.github.epelde.didactictribble.activity.BTDeviceListActivity;
 
 /**
  * Created by epelde on 19/01/2016.
  */
 public class BTDeviceListFragment extends ListFragment {
 
-    public static final String SELECTED_DEVICE = "io.github.epelde.didactictribble.fragment.SELECTED_DEVICE";
-
     private static final String LOG_TAG = BTDeviceListFragment.class.getSimpleName();
     private static final int REQUEST_ENABLE_BT = 1;
     private static BluetoothAdapter btAdapter;
     private static ArrayAdapter<String> arrayAdapter;
     private static List<BluetoothDevice> devices;
+    private SelectionListener listener;
+
+    public interface SelectionListener {
+        public void selected();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,14 @@ public class BTDeviceListFragment extends ListFragment {
         arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1);
         setListAdapter(arrayAdapter);
         getActivity().registerReceiver(btFoundReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof SelectionListener) {
+            listener = (SelectionListener) context;
+        }
     }
 
     private boolean checkBluetooth() {
@@ -72,36 +84,41 @@ public class BTDeviceListFragment extends ListFragment {
             case REQUEST_ENABLE_BT:
                 if (resultCode == Activity.RESULT_OK) {
                     Toast.makeText(getActivity(), R.string.msg_searching_bluetooth_devices, Toast.LENGTH_SHORT).show();
-                    btAdapter.startDiscovery();
                 } else {
                     Toast.makeText(getActivity(), R.string.msg_bluetooh_not_enabled, Toast.LENGTH_LONG).show();
                 }
                 break;
         }
+        btAdapter.startDiscovery();
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+        if (btAdapter.isDiscovering()) {
+            btAdapter.cancelDiscovery();
+        }
         Intent resultIntent = new Intent();
-        resultIntent.putExtra(SELECTED_DEVICE, devices.get(position));
+        resultIntent.putExtra(BTDeviceListActivity.SELECTED_DEVICE, devices.get(position));
         getActivity().setResult(Activity.RESULT_OK, resultIntent);
         getActivity().unregisterReceiver(btFoundReceiver);
-        getActivity().finish();
+        //getActivity().finish();
+        listener.selected();
     }
 
     private final BroadcastReceiver btFoundReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
-                if (devices == null) {
-                    devices = new ArrayList<>();
-                }
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                devices.add(device);
-                arrayAdapter.add(device.getName());
-                arrayAdapter.notifyDataSetInvalidated();
+        if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
+            if (devices == null) {
+                devices = new ArrayList<>();
             }
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            //Log.i(LOG_TAG, "* * * BroadcastReceiver UUID=" + device.getUuids()[0].getUuid().toString());
+            devices.add(device);
+            arrayAdapter.add(device.getName() + "\n" + device.getAddress());
+            arrayAdapter.notifyDataSetInvalidated();
+        }
         }
     };
 }

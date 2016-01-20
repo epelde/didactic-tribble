@@ -74,7 +74,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/ic_print_black_48dp"
-            android:text="@string/button_print_ticket_text" />
+            android:text="@string/button_print_ticket_text"
+            android:visibility="visible" />
 
     </LinearLayout>
 </RelativeLayout>

@@ -1,6 +1,6 @@
 <resources>
     <!-- Activities -->
-    <string name="app_name">Prototipo</string>
+    <string name="app_name">Bizkaidendak</string>
     <string name="activity_device_list">Selecciona la impresora</string>
 
     <!-- Buttons -->

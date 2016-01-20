@@ -45,6 +45,8 @@
             android:label="@string/activity_device_list"
             android:screenOrientation="portrait" />
 
+        <activity android:name="BTDeviceList" android:screenOrientation="portrait"></activity>
+
     </application>
 
 </manifest>

@@ -1,170 +1,156 @@
 package io.github.epelde.didactictribble.activity;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.Set;
+import java.io.OutputStream;
 import java.util.UUID;
 
-import io.github.epelde.didactictribble.GenerateTicketClient;
-import io.github.epelde.didactictribble.GenerateTicketResponse;
-import io.github.epelde.didactictribble.R;
-import io.github.epelde.didactictribble.Service;
 import io.github.epelde.didactictribble.Ticket;
-import retrofit.Call;
-import retrofit.Response;
+import io.github.epelde.didactictribble.fragment.TicketFragment;
 
 /**
  * Created by epelde on 30/12/2015.
  */
-public class TicketActivity extends AppCompatActivity {
+public class TicketActivity extends SingleFragmentActivity implements TicketFragment.PrintTicketListener {
 
     private static final String LOG_TAG = TicketActivity.class.getSimpleName();
 
-    private TextView ticketDate;
-    private TextView ticketBusinessName;
-    private TextView ticketBusinessAddress;
-    private TextView ticketDescription;
-    private TextView ticketCode;
-    private ImageView mQrImage;
-    private Button printButton;
-
-    private BluetoothAdapter bluetoohAdapter;
-    private BluetoothSocket bluetoothSocket;
-    private BluetoothDevice bluetoothDevice;
+    private Ticket ticket;
+    private static BluetoothSocket socket;
+    private byte FONT_TYPE;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ticket);
-        ticketDate = (TextView) findViewById(R.id.date_text_view);
-        ticketBusinessName = (TextView) findViewById(R.id.business_name_text_view);
-        ticketBusinessAddress = (TextView) findViewById(R.id.business_address_text_view);
-        ticketDescription = (TextView) findViewById(R.id.description_text_view);
-        ticketCode = (TextView) findViewById(R.id.code_text_view);
-        mQrImage = (ImageView) findViewById(R.id.qr_image_view);
-        printButton = (Button) findViewById(R.id.print_button);
-        printButton.setOnClickListener(new View.OnClickListener() {
+    protected void onPause() {
+        super.onPause();
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                socket = null;
+            }
+        }
+    }
+
+    @Override
+    public Fragment createFragment() {
+        return new TicketFragment();
+    }
+
+    @Override
+    public void printTicket(Ticket t) {
+        //Log.i(LOG_TAG, "* * * Ticket:" + t.getCode());
+        //ticket = t;
+        if (socket == null) {
+            startActivityForResult(new Intent(this, BTDeviceListActivity.class), BTDeviceListActivity.SELECT_DEVICE);
+            //this.startActivityForResult(new Intent(getApplicationContext(), BTDeviceList.class), BTDeviceList.REQUEST_CONNECT_BT);
+        }
+    }
+
+/*    @Override
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Thread connectThread = new Thread(new Runnable() {
             @Override
-            public void onClick(View v) {
-                printTicket();
+            public void run() {
+                try {
+                    //btsocket = BTDeviceList.getSocket();
+                    Log.i(">>>", "Printing");
+                    BluetoothDevice device = (BluetoothDevice) data.getParcelableExtra("DEVICE");
+                    UUID uuid = device.getUuids()[0].getUuid();
+                    Log.i(">>>", "uuid:" + uuid.toString());
+                    socket = device.createRfcommSocketToServiceRecord(uuid);
+                    socket.connect();
+                    if(socket != null){
+                        print_bt();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    try {
+                        socket.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
             }
         });
-        new GenerateTicketTask().execute();
-    }
 
-    private void displayTicket(Ticket t) {
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", new Locale("es", "ES"));
-        ticketDate.setText(df.format(t.getDate()));
-        ticketBusinessName.setText(t.getBusinessName());
-        ticketBusinessAddress.setText(t.getBusinessAddress());
-        ticketDescription.setText(t.getDescription());
-        ticketCode.setText(t.getCode());
-        Picasso.with(this)
-                .load(t.getQrCodeUrl())
-                .into(mQrImage);
-        printButton.setVisibility(View.VISIBLE);
-    }
+        connectThread.start();
+    }*/
 
-    private class GenerateTicketTask extends AsyncTask<Void, Void, Ticket> {
-        @Override
-        protected Ticket doInBackground(Void... params) {
-            Service client = GenerateTicketClient.createService(Service.class);
-            Call<GenerateTicketResponse> call = client.generateTicket();
-            Response<GenerateTicketResponse> apiResponse = null;
-            try {
-                apiResponse = call.execute();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-            return apiResponse.body().getTickets().get(0);
-        }
-
-        @Override
-        protected void onPostExecute(Ticket t) {
-            super.onPostExecute(t);
-            displayTicket(t);
-        }
-    }
-
-    private void printTicket() {
-        Log.i(LOG_TAG, "* * * Running PrintTicketThread...");
-        bluetoohAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        if (bluetoothSocket != null) {
-            try {
-                bluetoothSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            bluetoothSocket = null;
-        }
-
-        if (bluetoohAdapter != null) {
-            if (bluetoohAdapter.isDiscovering()) {
-                bluetoohAdapter.cancelDiscovery();
-            }
-            Set<BluetoothDevice> pairedDevices = bluetoohAdapter.getBondedDevices();
-            Log.i(LOG_TAG, "* * * PAIRED DEVICES " + pairedDevices.size());
-            if (pairedDevices.size() == 1) {
-                for (BluetoothDevice device : pairedDevices) {
-                    Log.i(LOG_TAG, "* * * DEVICE:" + device.getName());
-                    bluetoothDevice = device;
-                }
-                new PrintTicketThread().start();
-
-            }
-        }
-
-    }
-
-    private class PrintTicketThread extends Thread {
-
-        public void run() {
-            Log.i(LOG_TAG, "* * * Running PrintTicketThread...");
-            boolean gotuuid = bluetoothDevice.fetchUuidsWithSdp();
-            UUID uuid = bluetoothDevice.getUuids()[0].getUuid();
-            try {
-                bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
-                if (bluetoothSocket == null) {
-                    Log.e(LOG_TAG, "* * * Socket nulo");
-                } else {
-                    Log.i(LOG_TAG, "* * * " + bluetoothSocket.isConnected());
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e(LOG_TAG, e.getMessage());
-            }
-
-            try {
-                bluetoothSocket.connect();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e(LOG_TAG, e.getMessage());
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Thread connectingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
                 try {
-                    bluetoothSocket.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
+                    if (BluetoothAdapter.getDefaultAdapter().isDiscovering()) {
+                        BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+                    }
+                    BluetoothDevice device = (BluetoothDevice) data.getParcelableExtra(BTDeviceListActivity.SELECTED_DEVICE);
+                    Log.i(LOG_TAG, "* * * Selected Device Name: " + device.getName());
+                    Log.i(LOG_TAG, "* * * " + device.getUuids().length);
+                    UUID uuid = device.getUuids()[0].getUuid();
+                    Log.i(LOG_TAG, "* * * 3");
+                    Log.i(LOG_TAG, "* * * Connecting to uuid:" + uuid.toString());
+                    socket = device.createRfcommSocketToServiceRecord(uuid);
+                    Log.i(LOG_TAG, "* * * Calling to connect!");
+                    socket.connect();
+                    if(socket != null){
+                        print_bt();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e(LOG_TAG, e.getMessage());
+                    try {
+                        socket.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
-                bluetoothSocket = null;
             }
+        });
+
+        if (requestCode == BTDeviceListActivity.SELECT_DEVICE && resultCode == Activity.RESULT_OK) {
+            connectingThread.start();
         }
+    }
+
+
+    private void print_bt() {
+        Thread printingThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    OutputStream btoutputstream = socket.getOutputStream();
+                    byte[] printformat = { 0x1B, 0x21, FONT_TYPE };
+                    btoutputstream.write(printformat);
+                    String msg = ticket.getDescription();
+                    btoutputstream.write(msg.getBytes());
+                    btoutputstream.write(0x0D);
+                    btoutputstream.write(0x0D);
+                    btoutputstream.write(0x0D);
+                    btoutputstream.flush();
+                    btoutputstream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        printingThread.start();
     }
 
 }
