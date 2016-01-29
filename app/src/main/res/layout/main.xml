@@ -1,32 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp" >
-
-<TextView
-android:id="@+id/msgtextlbl"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="Enter Your Message : " >
-    </TextView>
+    android:orientation="vertical">
 
-<EditText
-android:id="@+id/message"
-    android:layout_width="fill_parent"
-    android:layout_height="100dp"
-    android:layout_below="@+id/msgtextlbl"
-    android:text="" >
+    <Button
+        android:id="@+id/btnSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btnSearch"></Button>
+
+    <ImageView
+        android:id="@+id/code_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
+    <EditText
+        android:id="@+id/txt_content"
+        android:layout_width="match_parent"
+        android:layout_height="135dp"
+        android:gravity="center_vertical|top"
+        android:text="@string/txt_content"
+        android:textSize="16sp">
+
     </EditText>
 
-<Button
-android:id="@+id/printButton"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_below="@+id/message"
-    android:layout_marginTop="5dip"
-    android:layout_centerHorizontal="true"
-    android:text="Print" >
+    <Button
+        android:id="@+id/btnSend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btnSend">
+
     </Button>
-    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_test"></Button>
+
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btnClose"></Button>
+</LinearLayout>

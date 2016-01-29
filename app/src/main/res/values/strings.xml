@@ -1,16 +1,15 @@
 <resources>
-    <!-- Activities -->
-    <string name="app_name">Bizkaidendak</string>
-    <string name="activity_device_list">Selecciona la impresora</string>
-
-    <!-- Buttons -->
-    <string name="button_generate_ticket_text">Generar ticket</string>
-    <string name="button_print_ticket_text">Imprimir ticket</string>
-    <string name="button_validate_ticket_text">Validar ticket</string>
-
-    <!-- Messages -->
-    <string name="msg_bluetooh_not_supported">Bluetooh no soportado por el dispositivo</string>
-    <string name="msg_bluetooh_not_enabled">Es necesario activar el Bluetooh para poder generar e imprimir tickets</string>
-    <string name="msg_bluetooh_adapter_not_available">Adaptador de Bluetooh no disponible en el dispositivo</string>
-    <string name="msg_searching_bluetooth_devices">Buscando dispositivos Bluetooth...</string>
+    <string name="app_name">PrintDemo</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="scanning">scanning for devices...</string>
+    <string name="select_device">select a device to connect</string>
+    <string name="none_found">No devices found</string>
+    <string name="btnSearch">Connect  Bluetooth  Printer</string>
+    <string name="btnSend">Print</string>
+    <string name="btn_test">Print  Test  Page</string>
+    <string name="btnClose">Close</string>
+    <string name="txt_content">&quot;&quot;</string>
+    <string name="menu_settings">set</string>
+    <string name="strLang">en</string>
+    <string name="button_scan">Scan for devices</string>
 </resources>
