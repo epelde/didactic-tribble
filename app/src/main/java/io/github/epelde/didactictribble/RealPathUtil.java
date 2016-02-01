@@ -1,4 +1,4 @@
-package com.zj.printdemo;
+package io.github.epelde.didactictribble;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

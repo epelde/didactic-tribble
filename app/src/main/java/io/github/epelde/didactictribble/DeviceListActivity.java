@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.zj.printdemo;
+package io.github.epelde.didactictribble;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -38,8 +38,6 @@ import android.widget.TextView;
 import com.zj.btsdk.BluetoothService;
 
 import java.util.Set;
-
-import io.github.epelde.didactictribble.R;
 
 /**
  * This Activity appears as a dialog. It lists any paired devices and

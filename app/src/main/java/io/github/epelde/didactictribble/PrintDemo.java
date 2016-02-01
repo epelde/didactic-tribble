@@ -1,4 +1,4 @@
-package com.zj.printdemo;
+package io.github.epelde.didactictribble;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -19,8 +19,6 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.zj.btsdk.BluetoothService;
 import com.zj.btsdk.PrintPic;
-
-import io.github.epelde.didactictribble.R;
 
 public class PrintDemo extends Activity {
 	Button btnSearch;
