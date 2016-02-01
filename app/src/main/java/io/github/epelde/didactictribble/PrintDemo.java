@@ -5,7 +5,9 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,9 +18,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
 import com.zj.btsdk.BluetoothService;
 import com.zj.btsdk.PrintPic;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class PrintDemo extends Activity {
 	Button btnSearch;
@@ -67,9 +73,6 @@ public class PrintDemo extends Activity {
 			btnSend.setEnabled(false);
 			btnSendDraw.setEnabled(false);
 			codeImageView = (ImageView) findViewById(R.id.code_image_view);
-			Picasso.with(this)
-				.load("https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=ES48001001000320160128133818")
-				.into(codeImageView);
 		} catch (Exception ex) {
             Log.e("* * *",ex.getMessage());
 		}
@@ -104,12 +107,16 @@ public class PrintDemo extends Activity {
         	    cmd[0] = 0x1b;
         	    cmd[1] = 0x21;
             	if((lang.compareTo("en")) == 0){	
-            		cmd[2] |= 0x10;
+            		cmd[2] |= 0x225;
             		mService.write(cmd);
-            		mService.sendMessage("Kobazulo\n", "GBK");
+					//cmd[0] = 0x1b;
+					//cmd[1] = 0x2D;
+					//cmd[2] = 0x02;
+					mService.write(cmd);
+            		mService.sendMessage("PROBANDO PROBANDO\n", "GBK");
             		cmd[2] &= 0xEF;
             		mService.write(cmd);
-            		msg = "SUPEROFERTA Pagina web 50%\n\nCode: ES48001001000320160128133818\n\n";
+            		msg = "Code: ES48001001000320160128133818\n\n";
             		mService.sendMessage(msg,"GBK");
             	}else if((lang.compareTo("ch")) == 0){
             		cmd[2] |= 0x10;
@@ -120,7 +127,7 @@ public class PrintDemo extends Activity {
             		msg = "  ���Ѿ��ɹ��������������ǵ�������ӡ����\n\n"
             		+ "  ����˾��һ��רҵ�����з�����������������Ʊ�ݴ�ӡ��������ɨ���豸��һ��ĸ߿Ƽ���ҵ.\n\n";
             	    
-            		mService.sendMessage(msg,"GBK");	
+            		mService.sendMessage(msg,"GBK");
             	}
 			}
 		}
@@ -188,22 +195,67 @@ public class PrintDemo extends Activity {
     
     @SuppressLint("SdCardPath")
 	private void printImage() {
-    	byte[] sendData = null;
-    	PrintPic pg = new PrintPic();
-    	pg.initCanvas(384);     
-    	pg.initPaint();
-
-		/*Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.qr);
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-		String path = MediaStore.Images.Media.insertImage(this.getContentResolver(), bitmap, "Title", null);*/
-		Uri uri = new Uri.Builder().path("https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=ES48001001000320160128133818").build();
-		String realPath = RealPathUtil.getRealPathFromURI_API19(this, uri);
-		//Uri uriFromPath = Uri.fromFile(new File(realPath));
-
-
-    	pg.drawImage(0, 0, realPath);
-    	sendData = pg.printDraw();
-    	mService.write(sendData);
+		new ImageFetcherTask().execute();
     }
+
+	private class ImageFetcherTask extends AsyncTask<Void, Void, byte[]> {
+
+		@Override
+		protected byte[] doInBackground(Void... params) {
+			byte[] imgBytes = null;
+			try {
+				//imgBytes = new ImageFetcher().getUrlBytes("https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=ES48001001000320160128133818");
+				String f = "http://i.stack.imgur.com/oiRVe.png";
+				//String f = "http://cdn.flaticon.com/png/256/33447.png";
+				imgBytes = new ImageFetcher().getUrlBytes(f);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return imgBytes;
+		}
+
+		@Override
+		protected void onPostExecute(byte[] result) {
+			super.onPostExecute(result);
+			byte[] sendData = null;
+			Log.i("* * * ", "* * * RESULT LENGTH:" + result.length);
+			try {
+				File tempFile = File.createTempFile("chart", ".png");
+				FileOutputStream fos = new FileOutputStream(tempFile);
+				fos.write(result);
+				if (tempFile.exists()) {
+					Bitmap myBitmap = BitmapFactory.decodeFile(tempFile.getAbsolutePath());
+					codeImageView.setImageBitmap(myBitmap);
+
+					/*
+					PrintPic pg = new PrintPic();
+					pg.initCanvas(384);
+					pg.initPaint();
+					pg.drawImage(0, 0, tempFile.getAbsolutePath());
+					sendData = pg.printDraw();
+					mService.write(PrinterCommands.SELECT_BIT_IMAGE_MODE);
+					mService.write(sendData);*/
+
+					PrintPic pg = new PrintPic();
+					pg.initCanvas(384);
+					pg.initPaint();
+					pg.drawImage(0, 0, tempFile.getAbsolutePath());
+					sendData = pg.printDraw();
+
+					//ByteArrayOutputStream stream = new ByteArrayOutputStream();
+					//myBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+					//sendData = stream.toByteArray();
+					mService.write(PrinterCommands.SELECT_BIT_IMAGE_MODE);
+					mService.write(sendData);
+				}
+
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				Log.e("* * * ", "* * * FILE NOT FOUND");
+			} catch (IOException e) {
+				e.printStackTrace();
+				Log.e("* * * ", "* * * IO EXCEPTION");
+			}
+		}
+	}
 }
