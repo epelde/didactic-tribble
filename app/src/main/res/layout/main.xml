@@ -5,44 +5,15 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/btnSearch"
+        android:id="@+id/btnConnect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/btnSearch"></Button>
-
-    <ImageView
-        android:id="@+id/code_image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
-
-    <EditText
-        android:id="@+id/txt_content"
-        android:layout_width="match_parent"
-        android:layout_height="135dp"
-        android:gravity="center_vertical|top"
-        android:text="@string/txt_content"
-        android:textSize="16sp">
-
-    </EditText>
+        android:text="@string/btn_connect" />
 
     <Button
-        android:id="@+id/btnSend"
+        android:id="@+id/btnPrint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/btnSend">
+        android:text="@string/btnPrint" />
 
-    </Button>
-
-    <Button
-        android:id="@+id/btn_test"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_test"></Button>
-
-    <Button
-        android:id="@+id/btnClose"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btnClose"></Button>
 </LinearLayout>

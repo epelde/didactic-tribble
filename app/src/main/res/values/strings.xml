@@ -1,5 +1,14 @@
 <resources>
-    <string name="app_name">PrintDemo</string>
+    <string name="app_name">Ticket Demo</string>
+    <string name="btn_connect">Conectar impresora</string>
+    <string name="btnPrint">Imprimir ticket</string>
+
+    <string name="msg_connected">Conectado a la impresora</string>
+    <string name="msg_connection_lost">Se ha perdido la conexión con la impresora</string>
+    <string name="msg_unable_connect">No se ha podido conectar con la impresora</string>
+    <string name="msg_bluetooth_not_available">Bluetooth no activado</string>
+    <string name="msg_bluetooth_enabled">Bluetooth activado</string>
+
     <string name="none_paired">No devices have been paired</string>
     <string name="scanning">scanning for devices...</string>
     <string name="select_device">select a device to connect</string>

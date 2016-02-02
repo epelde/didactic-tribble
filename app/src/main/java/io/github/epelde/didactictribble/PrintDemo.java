@@ -1,55 +1,45 @@
 package io.github.epelde.didactictribble;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.zj.btsdk.BluetoothService;
-import com.zj.btsdk.PrintPic;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class PrintDemo extends Activity {
-    Button btnSearch;
-    Button btnSendDraw;
-    Button btnSend;
-    Button btnClose;
-    EditText edtContext;
-    EditText edtPrint;
-    private static final int REQUEST_ENABLE_BT = 2;
-    BluetoothService mService = null;
-    BluetoothDevice con_dev = null;
-    private static final int REQUEST_CONNECT_DEVICE = 1;
-    private static final int REQUEST_SELECT_IMAGE = 3;
 
-    /**
-     * Called when the activity is first created.
-     */
+    private static final int REQUEST_CONNECT_DEVICE = 1;
+    private static final int REQUEST_ENABLE_BT = 2;
+
+    Button btnConnect;
+    Button btnPrint;
+    BluetoothService mService;
+
+    private static final String LOG_TAG = PrintDemo.class.getSimpleName();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         mService = new BluetoothService(this, mHandler);
         if (mService.isAvailable() == false) {
-            Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-            finish();
+            Toast.makeText(this, R.string.msg_bluetooth_not_available, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -60,75 +50,40 @@ public class PrintDemo extends Activity {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
         }
-        try {
-            btnSendDraw = (Button) this.findViewById(R.id.btn_test);
-            btnSendDraw.setOnClickListener(new ClickEvent());
-            btnSearch = (Button) this.findViewById(R.id.btnSearch);
-            btnSearch.setOnClickListener(new ClickEvent());
-            btnSend = (Button) this.findViewById(R.id.btnSend);
-            btnSend.setOnClickListener(new ClickEvent());
-            btnClose = (Button) this.findViewById(R.id.btnClose);
-            btnClose.setOnClickListener(new ClickEvent());
-            edtContext = (EditText) findViewById(R.id.txt_content);
-            btnClose.setEnabled(false);
-            btnSend.setEnabled(false);
-            btnSendDraw.setEnabled(false);
-        } catch (Exception ex) {
-            Log.e("* * *", ex.getMessage());
+        btnConnect = (Button) this.findViewById(R.id.btnConnect);
+        btnConnect.setOnClickListener(new ClickEvent());
+        btnPrint = (Button) this.findViewById(R.id.btnPrint);
+        btnPrint.setOnClickListener(new ClickEvent());
+        btnPrint.setEnabled(false);
+    }
+
+/*    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mService != null) {
+            mService.stop();
+            mService = null;
         }
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mService != null)
-            mService.stop();
-        mService = null;
-    }
+    protected void onResume() {
+        super.onResume();
+        if (mService == null) {
+            mService = new BluetoothService(this, mHandler);
+            if (mService.isAvailable() == false) {
+                Toast.makeText(this, R.string.msg_bluetooth_not_available, Toast.LENGTH_LONG).show();
+            }
+        }
+    }*/
 
     class ClickEvent implements View.OnClickListener {
         public void onClick(View v) {
-            if (v == btnSearch) {
+            if (v == btnConnect) {
                 Intent serverIntent = new Intent(PrintDemo.this, DeviceListActivity.class);
                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
-            } else if (v == btnSend) {
-                String msg = edtContext.getText().toString();
-                if (msg.length() > 0) {
-                    mService.sendMessage(msg + "\n", "GBK");
-                }
-            } else if (v == btnClose) {
-                mService.stop();
-            } else if (v == btnSendDraw) {
-                String msg = "";
-                String lang = getString(R.string.strLang);
+            } else if (v == btnPrint) {
                 printImage();
-
-            	/*byte[] cmd = new byte[3];
-                cmd[0] = 0x1b;
-        	    cmd[1] = 0x21;
-            	if((lang.compareTo("en")) == 0){	
-            		cmd[2] |= 0x225;
-            		mService.write(cmd);
-					//cmd[0] = 0x1b;
-					//cmd[1] = 0x2D;
-					//cmd[2] = 0x02;
-					mService.write(cmd);
-            		mService.sendMessage("PROBANDO PROBANDO\n", "GBK");
-            		cmd[2] &= 0xEF;
-            		mService.write(cmd);
-            		msg = "Code: ES48001001000320160128133818\n\n";
-            		mService.sendMessage(msg,"GBK");
-            	}else if((lang.compareTo("ch")) == 0){
-            		cmd[2] |= 0x10;
-            		mService.write(cmd);
-        		    mService.sendMessage("��ϲ����\n", "GBK"); 
-            		cmd[2] &= 0xEF;
-            		mService.write(cmd);
-            		msg = "  ���Ѿ��ɹ��������������ǵ�������ӡ����\n\n"
-            		+ "  ����˾��һ��רҵ�����з�����������������Ʊ�ݴ�ӡ��������ɨ���豸��һ��ĸ߿Ƽ���ҵ.\n\n";
-            	    
-            		mService.sendMessage(msg,"GBK");
-            	}*/
             }
         }
     }
@@ -140,35 +95,27 @@ public class PrintDemo extends Activity {
                 case BluetoothService.MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case BluetoothService.STATE_CONNECTED:
-                            Toast.makeText(getApplicationContext(), "Connect successful",
+                            Toast.makeText(getApplicationContext(), R.string.msg_connected,
                                     Toast.LENGTH_SHORT).show();
-                            btnClose.setEnabled(true);
-                            btnSend.setEnabled(true);
-                            btnSendDraw.setEnabled(true);
-                            break;
-                        case BluetoothService.STATE_CONNECTING:
-                            Log.d("��������", "��������.....");
-                            break;
-                        case BluetoothService.STATE_LISTEN:
-                        case BluetoothService.STATE_NONE:
-                            Log.d("��������", "�ȴ�����.....");
+                            btnPrint.setEnabled(true);
+                            btnConnect.setEnabled(false);
                             break;
                     }
                     break;
                 case BluetoothService.MESSAGE_CONNECTION_LOST:
-                    Toast.makeText(getApplicationContext(), "Device connection was lost",
+                    Toast.makeText(getApplicationContext(), R.string.msg_connection_lost,
                             Toast.LENGTH_SHORT).show();
-                    btnClose.setEnabled(false);
-                    btnSend.setEnabled(false);
-                    btnSendDraw.setEnabled(false);
+                    btnPrint.setEnabled(false);
+                    btnConnect.setEnabled(true);
                     break;
                 case BluetoothService.MESSAGE_UNABLE_CONNECT:
-                    Toast.makeText(getApplicationContext(), "Unable to connect device",
+                    Toast.makeText(getApplicationContext(), R.string.msg_unable_connect,
                             Toast.LENGTH_SHORT).show();
+                    btnPrint.setEnabled(false);
+                    btnConnect.setEnabled(true);
                     break;
             }
         }
-
     };
 
     @Override
@@ -176,40 +123,24 @@ public class PrintDemo extends Activity {
         switch (requestCode) {
             case REQUEST_ENABLE_BT:
                 if (resultCode == Activity.RESULT_OK) {
-                    Toast.makeText(this, "Bluetooth open successful", Toast.LENGTH_LONG).show();
-                } else {
-                    finish();
+                    Toast.makeText(this, R.string.msg_bluetooth_enabled, Toast.LENGTH_LONG).show();
                 }
                 break;
             case REQUEST_CONNECT_DEVICE:
                 if (resultCode == Activity.RESULT_OK) {
                     String address = data.getExtras()
                             .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-                    con_dev = mService.getDevByMac(address);
-
-                    mService.connect(con_dev);
+                    if (mService == null) Log.i(LOG_TAG, "mService NULO");
+                    else Log.i(LOG_TAG, "mService available:" + mService.isAvailable());
+                    BluetoothDevice device = mService.getDevByMac(address);
+                    mService.connect(device);
                 }
                 break;
         }
     }
 
-    @SuppressLint("SdCardPath")
     private void printImage() {
         new ImageFetcherTask().execute();
-    }
-
-    private String getRealPathFromURI(Uri contentURI) {
-        String result;
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            result = contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
-        }
-        return result;
     }
 
     private class ImageFetcherTask extends AsyncTask<Void, Void, byte[]> {
@@ -222,6 +153,7 @@ public class PrintDemo extends Activity {
                 imgBytes = new ImageFetcher().getUrlBytes(f);
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.e(LOG_TAG, "Error generando ticket dinámicamente");
             }
             return imgBytes;
         }
@@ -229,28 +161,38 @@ public class PrintDemo extends Activity {
         @Override
         protected void onPostExecute(byte[] result) {
             super.onPostExecute(result);
-            Log.i("* * * ", "* * * RESULT LENGTH:" + result.length);
             try {
                 File tempFile = File.createTempFile("temp", ".png");
                 FileOutputStream fos = new FileOutputStream(tempFile);
                 fos.write(result);
                 fos.flush();
                 if (tempFile.exists()) {
-                    Log.i("* * *", "* * * FILE EXISTS!!!");
-                    PrintPic pg = new PrintPic();
+                   /* PrintPic pg = new PrintPic();
                     pg.initCanvas(384);
                     pg.initPaint();
                     pg.drawImage(0, 0, tempFile.getAbsolutePath());
-                    fos.close();
                     mService.write(pg.printDraw());
-                    //tempFile.delete();
+                    fos.close();
+                    tempFile.delete();*/
+
+                    mService.write(Commands.PRINT_ALIGNMENT_CENTER);
+                    mService.write(Commands.LEFT_MARGIN);
+                    SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                    //mService.write(Commands.LF);
+                    mService.sendMessage(df.format(new Date(System.currentTimeMillis())), "GBK");
+                    mService.sendMessage("Nombre del comercio", "GBK");
+                    mService.sendMessage("Dirección del comercio", "GBK");
+                    mService.write(Commands.BOLD_FONT_ON);
+                    mService.sendMessage("DESCRIPCIÓN DE LA OFERTA", "GBK");
+                    mService.write(Commands.BOLD_FONT_OFF);
+                    mService.sendMessage("ES48004001000220160202143642", "GBK");
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                Log.e("* * * ", "* * * FILE NOT FOUND");
+                Log.e(LOG_TAG, "Fichero temporal no encontrado");
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e("* * * ", "* * * IO EXCEPTION");
+                Log.e(LOG_TAG, "Erro accediendo al fichero temporal");
             }
         }
     }
