@@ -14,6 +14,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.zj.btsdk.BluetoothService;
+import com.zj.btsdk.PrintPic;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -130,8 +134,6 @@ public class PrintDemo extends Activity {
                 if (resultCode == Activity.RESULT_OK) {
                     String address = data.getExtras()
                             .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-                    if (mService == null) Log.i(LOG_TAG, "mService NULO");
-                    else Log.i(LOG_TAG, "mService available:" + mService.isAvailable());
                     BluetoothDevice device = mService.getDevByMac(address);
                     mService.connect(device);
                 }
@@ -143,56 +145,81 @@ public class PrintDemo extends Activity {
         new ImageFetcherTask().execute();
     }
 
-    private class ImageFetcherTask extends AsyncTask<Void, Void, byte[]> {
+    private class ImageFetcherTask extends AsyncTask<Void, Void, Ticket> {
 
         @Override
-        protected byte[] doInBackground(Void... params) {
-            byte[] imgBytes = null;
+        protected Ticket doInBackground(Void... params) {
+            Ticket ticket = null;
             try {
-                String f = "https://chart.googleapis.com/chart?chs=320x320&cht=qr&chl=ES48001001000320160128133818";
-                imgBytes = new ImageFetcher().getUrlBytes(f);
+                String json = ImageFetcher.getUrlString("http://www.kobazulo.net/clientes/fidelizacion/generar_ticket.asp?Pais=ES&Codigo=480040010001&Clave=5714&Idioma=ES");
+                JSONObject jsonBody = new JSONObject(json);
+                JSONObject jsonTicket = jsonBody.getJSONArray("datos").getJSONObject(0);
+                ticket = new Ticket();
+                ticket.setDate(jsonTicket.getString("FechaHora"));
+                ticket.setName(jsonTicket.getString("NombreComercio"));
+                ticket.setAddress(jsonTicket.getString("DireccionComercio"));
+                ticket.setDescription(jsonTicket.getString("DescripcionOferta"));
+                ticket.setCodeUrl(jsonTicket.getString("UrlQr"));
+                ticket.setCode(jsonTicket.getString("CodigoTicket"));
+                byte[] imageByte = ImageFetcher.getUrlBytes(ticket.getCodeUrl());
+                ticket.setImage(imageByte);
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e(LOG_TAG, "Error generando ticket dinámicamente");
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            return imgBytes;
+            return ticket;
         }
 
         @Override
-        protected void onPostExecute(byte[] result) {
-            super.onPostExecute(result);
-            try {
-                File tempFile = File.createTempFile("temp", ".png");
-                FileOutputStream fos = new FileOutputStream(tempFile);
-                fos.write(result);
-                fos.flush();
-                if (tempFile.exists()) {
-                   /* PrintPic pg = new PrintPic();
-                    pg.initCanvas(384);
-                    pg.initPaint();
-                    pg.drawImage(0, 0, tempFile.getAbsolutePath());
-                    mService.write(pg.printDraw());
-                    fos.close();
-                    tempFile.delete();*/
-
-                    mService.write(Commands.PRINT_ALIGNMENT_CENTER);
-                    mService.write(Commands.LEFT_MARGIN);
-                    SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                    //mService.write(Commands.LF);
-                    mService.sendMessage(df.format(new Date(System.currentTimeMillis())), "GBK");
-                    mService.sendMessage("Nombre del comercio", "GBK");
-                    mService.sendMessage("Dirección del comercio", "GBK");
-                    mService.write(Commands.BOLD_FONT_ON);
-                    mService.sendMessage("DESCRIPCIÓN DE LA OFERTA", "GBK");
-                    mService.write(Commands.BOLD_FONT_OFF);
-                    mService.sendMessage("ES48004001000220160202143642", "GBK");
+        protected void onPostExecute(Ticket ticket) {
+            super.onPostExecute(ticket);
+            if (ticket != null) {
+                File tempFile = null;
+                FileOutputStream fos = null;
+                try {
+                    tempFile = File.createTempFile("temp", ".png");
+                    fos = new FileOutputStream(tempFile);
+                    fos.write(ticket.getImage());
+                    if (tempFile.exists()) {
+                        mService.write(Commands.PRINT_SPEED);
+                        mService.write(Commands.INTERNATIONAL_CHARACTERSET);
+                        mService.write(Commands.PRINT_ALIGNMENT_CENTER);
+                        mService.sendMessage("******************************\n", "GBK");
+                        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                        mService.sendMessage(df.format(new Date(Long.valueOf(ticket.getDate()))) + "\n", "GBK");
+                        mService.write(Commands.FONT_SIZE_NAME);
+                        mService.sendMessage(ticket.getName(), "GBK");
+                        mService.write(Commands.FONT_SIZE_DESCRIPTION);
+                        mService.sendMessage(ticket.getAddress() + "\n", "GBK");
+                        mService.write(Commands.FONT_BOLD_ON);
+                        mService.sendMessage(ticket.getDescription() + "\n", "GBK");
+                        mService.write(Commands.FONT_BOLD_OFF);
+                        mService.sendMessage(ticket.getCode(), "GBK");
+                        PrintPic pg = new PrintPic();
+                        pg.initCanvas(384);
+                        pg.initPaint();
+                        pg.drawImage(0, 0, tempFile.getAbsolutePath());
+                        mService.write(pg.printDraw());
+                        mService.sendMessage("******************************\n\n", "GBK");
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (tempFile != null && tempFile.exists()) {
+                        tempFile.delete();
+                    }
+                    if (fos != null) {
+                        try {
+                            fos.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                Log.e(LOG_TAG, "Fichero temporal no encontrado");
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e(LOG_TAG, "Erro accediendo al fichero temporal");
             }
         }
     }

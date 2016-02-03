@@ -11,7 +11,7 @@ import java.net.URL;
  */
 public class ImageFetcher {
 
-    public byte[] getUrlBytes(String urlSpec) throws IOException {
+    public static byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         try {
@@ -30,5 +30,9 @@ public class ImageFetcher {
         } finally {
             connection.disconnect();
         }
+    }
+
+    public static String getUrlString(String urlSpec) throws IOException {
+        return new String(getUrlBytes(urlSpec));
     }
 }
