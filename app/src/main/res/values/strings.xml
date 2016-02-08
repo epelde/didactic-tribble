@@ -21,4 +21,11 @@
     <string name="menu_settings">set</string>
     <string name="strLang">en</string>
     <string name="button_scan">Scan for devices</string>
+
+    <string name="msg_no_printer">No hay impresora configurada</string>
+
+    <string name="label_button_config">Configurar impresora</string>
+    <string name="label_button_select">Seleccionar impresora</string>
+
+    <string name="KEY_PRINTER_ADRESS">key_printer_address</string>
 </resources>
