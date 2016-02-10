@@ -25,8 +25,7 @@
     <string name="msg_bluetooth_enabled">Bluetooth activado</string>
 
     <string name="button_config">Configurar impresora</string>
-    <string name="button_select">Seleccionar impresora</string>
-    <string name="button_scan">Buscar impresoras</string>
+    <string name="button_scan">Buscar impresora</string>
 
     <string name="KEY_PRINTER_ADRESS">key_printer_address</string>
 </resources>
