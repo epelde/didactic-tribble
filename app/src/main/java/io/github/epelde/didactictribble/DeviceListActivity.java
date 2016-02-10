@@ -50,6 +50,11 @@ public class DeviceListActivity extends Activity {
             }
         });
 
+        devicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.device_name);
+        ListView devicesListView = (ListView) findViewById(R.id.devices_list_view);
+        devicesListView.setAdapter(devicesArrayAdapter);
+        devicesListView.setOnItemClickListener(deviceClickListener);
+        
         service = new BluetoothService(this, null);
         if (service.isAvailable() == false) {
             Toast.makeText(this, R.string.toast_msg_bluetooth_not_available, Toast.LENGTH_SHORT).show();
@@ -91,10 +96,6 @@ public class DeviceListActivity extends Activity {
     }
 
     private void loadPairedDevices() {
-        devicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.device_name);
-        ListView devicesListView = (ListView) findViewById(R.id.devices_list_view);
-        devicesListView.setAdapter(devicesArrayAdapter);
-        devicesListView.setOnItemClickListener(deviceClickListener);
         Set<BluetoothDevice> pairedDevices = service.getPairedDev();
         if (!pairedDevices.isEmpty()) {
             for (BluetoothDevice device : pairedDevices) {
