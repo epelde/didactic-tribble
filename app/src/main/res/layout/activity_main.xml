@@ -11,6 +11,12 @@
         android:orientation="vertical">
 
         <Button
+            android:id="@+id/print_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_print" />
+
+        <Button
             android:id="@+id/config_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
