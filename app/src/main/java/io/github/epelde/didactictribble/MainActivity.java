@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 String address = getPreferences(MODE_PRIVATE).getString(
                         getString(R.string.KEY_PRINTER_ADRESS), null);
-                // checking if there is mad address stored
+                // checking if there is mac address stored
                 if (address == null) {
                     Toast.makeText(MainActivity.this, R.string.toast_msg_no_printer, Toast.LENGTH_SHORT).show();
                 } else {

@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zj.btsdk.BluetoothService;
 
@@ -28,38 +29,39 @@ public class DeviceListActivity extends Activity {
 
     private BluetoothService service = null;
     private ArrayAdapter<String> devicesArrayAdapter;
+    private Button scanButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_list);
         setResult(Activity.RESULT_CANCELED); // Set result CANCELED in case the user backs out
-        // Initialize the button to perform device discovery
-        Button scanButton = (Button) findViewById(R.id.button_scan);
-        scanButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                doDiscovery();
-                v.setVisibility(View.GONE);
-            }
-        });
-
-        devicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.device_name);
-        ListView devicesListView = (ListView) findViewById(R.id.devices_list_view);
-        devicesListView.setAdapter(devicesArrayAdapter);
-        devicesListView.setOnItemClickListener(deviceClickListener);
-        service = new BluetoothService(this, null);
-        Set<BluetoothDevice> pairedDevices = service.getPairedDev();
-        if (!pairedDevices.isEmpty()) {
-            for (BluetoothDevice device : pairedDevices) {
-                devicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-            }
-        }
 
         // Register for broadcasts when a device is discovered
         this.registerReceiver(receiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
         // Register for broadcasts when discovery has finished
         this.registerReceiver(receiver,
                 new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+
+        scanButton = (Button) findViewById(R.id.button_scan);
+        scanButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                doDiscovery();
+            }
+        });
+
+        service = new BluetoothService(this, null);
+        if (service.isAvailable() == false) {
+            Toast.makeText(this, R.string.toast_msg_bluetooth_not_available, Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            if (service.isBTopen() == false) {
+                startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
+                        REQUEST_CODE_ENABLE_BT);
+            } else {
+                loadPairedDevices();
+            }
+        }
     }
 
     @Override
@@ -72,19 +74,49 @@ public class DeviceListActivity extends Activity {
         this.unregisterReceiver(receiver);
     }
 
-    /**
-     * Start device discover with the BluetoothAdapter
-     */
     private void doDiscovery() {
-        // Indicate scanning in the title
-        setProgressBarIndeterminateVisibility(true);
-        setTitle(R.string.scanning);
-        // If we're already discovering, stop it
-        if (service.isDiscovering()) {
-            service.cancelDiscovery();
+        if (service.isBTopen()) {
+            scanButton.setVisibility(View.GONE);
+            // If we're already discovering, stop it
+            if (service.isDiscovering()) {
+                service.cancelDiscovery();
+            }
+            // Request discover from BluetoothAdapter
+            service.startDiscovery();
+        } else {
+            Toast.makeText(this, R.string.toast_msg_must_enable_bluetooth,
+                    Toast.LENGTH_SHORT).show();
+            finish();
         }
-        // Request discover from BluetoothAdapter
-        service.startDiscovery();
+    }
+
+    private void loadPairedDevices() {
+        devicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.device_name);
+        ListView devicesListView = (ListView) findViewById(R.id.devices_list_view);
+        devicesListView.setAdapter(devicesArrayAdapter);
+        devicesListView.setOnItemClickListener(deviceClickListener);
+        Set<BluetoothDevice> pairedDevices = service.getPairedDev();
+        if (!pairedDevices.isEmpty()) {
+            for (BluetoothDevice device : pairedDevices) {
+                devicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_CODE_ENABLE_BT:
+                if (resultCode == RESULT_CANCELED) {
+                    Toast.makeText(this, R.string.toast_msg_must_enable_bluetooth,
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    loadPairedDevices();
+                }
+                break;
+        }
     }
 
     // The on-click listener for all devices in the ListViews
