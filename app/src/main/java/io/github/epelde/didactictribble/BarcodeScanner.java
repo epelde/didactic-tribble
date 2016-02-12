@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
@@ -19,10 +20,17 @@ import net.sourceforge.zbar.ImageScanner;
 import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 
+import java.io.IOException;
+
+import retrofit.Call;
+import retrofit.Response;
+
 /**
  * Created by epelde on 12/02/2016.
  */
 public class BarcodeScanner extends Activity {
+
+    private static final String LOG_TAG = BarcodeScanner.class.getSimpleName();
 
     private Camera mCamera;
     private CameraPreview mPreview;
@@ -130,11 +138,12 @@ public class BarcodeScanner extends Activity {
                     Log.i("<<<<<<Asset Code>>>>> ",
                             "<<<<Bar Code>>> " + sym.getData());
                     String scanResult = sym.getData().trim();
-
                     showAlertDialog(scanResult);
 
               /*  Toast.makeText(BarcodeScanner.this, scanResult,
                         Toast.LENGTH_SHORT).show();*/
+
+                    //new ValidateTicketTask().execute(scanResult);
 
                     barcodeScanned = true;
 
@@ -153,13 +162,35 @@ public class BarcodeScanner extends Activity {
 
     private void showAlertDialog(String message) {
         new AlertDialog.Builder(this)
-                .setTitle(getResources().getString(R.string.app_name))
-                .setCancelable(false)
-                .setMessage(message)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
+            .setTitle(getResources().getString(R.string.app_name))
+            .setCancelable(false)
+            .setMessage(message)
+            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
 
-                    }
-                }).show();
+                }
+            }).show();
+    }
+
+    private class ValidateTicketTask extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... code) {
+            Log.i(LOG_TAG, "* * * CODE:" + code);
+            KobazuloService service = KobazuloService.Factory.create();
+            Call<Results> call = service.validateTicket(code[0]);
+            try {
+                Response<Results> response = call.execute();
+                Log.i(LOG_TAG, "* * * RESPONSE SUCCESS:" + response.isSuccess());
+                Results results = response.body();
+                Log.i(LOG_TAG, "* * * RESULTS:" + results.getData().size());
+                for (ResultData d : results.getData()) {
+                    Log.i(LOG_TAG, "* * * DATA:" + d.getError());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }
