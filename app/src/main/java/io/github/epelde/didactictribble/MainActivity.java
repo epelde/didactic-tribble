@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         scanBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                startActivity(new Intent(v.getContext(), BarcodeScanner.class));
             }
         });
     }

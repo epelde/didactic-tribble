@@ -28,6 +28,10 @@
         <activity
             android:name=".DeviceListActivity"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".BarcodeScanner"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
