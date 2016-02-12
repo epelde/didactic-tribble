@@ -10,7 +10,7 @@
     <string name="none_paired">No devices have been paired</string>
     <string name="scanning">scanning for devices...</string>
     <string name="select_device">select a device to connect</string>
-    <string name="none_found">No devices found</string>
+
     <string name="btnSearch">Connect  Bluetooth  Printer</string>
     <string name="btnSend">Print</string>
     <string name="btn_test">Print  Test  Page</string>
@@ -25,14 +25,18 @@
     <!-- Key for storing device's MAC address -->
     <string name="KEY_PRINTER_ADRESS">key_printer_address</string>
 
+    <string name="no_devices_found">No se ha encontrado ningún dispositivo Bluetooth</string>
+
     <!-- Toast messages displayed to the user -->
-    <string name="toast_msg_no_printer">Debes configurar una impresora</string>
+    <string name="toast_msg_printer_no_configured">Debes configurar una impresora</string>
+    <string name="toast_msg_printer_configured">Impresora configurada</string>
     <string name="toast_msg_bluetooth_not_available">Bluetooth no disponible</string>
     <string name="toast_msg_must_enable_bluetooth">Debes activar el Bluetooth del dispositivo</string>
 
     <!-- Button texts -->
     <string name="button_config">Configurar impresora</string>
-    <string name="button_scan">Buscar impresora</string>
     <string name="button_print">Imprimir ticket</string>
+    <string name="button_scan_code">Validar ticket</string>
+    <string name="button_scan_devices">Buscar impresora</string>
 
 </resources>

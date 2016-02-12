@@ -15,6 +15,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,10 +27,13 @@ public class DeviceListActivity extends Activity {
 
     private static final int REQUEST_CODE_ENABLE_BT = 1;
     public static final String EXTRA_DEVICE_ADDRESS = "didactictribble.device_address";
+    private static final String LOG_TAG = DeviceListActivity.class.getSimpleName();
 
     private BluetoothService service = null;
     private ArrayAdapter<String> devicesArrayAdapter;
     private Button scanButton;
+    private ProgressBar progress;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +58,8 @@ public class DeviceListActivity extends Activity {
         ListView devicesListView = (ListView) findViewById(R.id.devices_list_view);
         devicesListView.setAdapter(devicesArrayAdapter);
         devicesListView.setOnItemClickListener(deviceClickListener);
-        
+        progress = (ProgressBar) findViewById(R.id.progress);
+
         service = new BluetoothService(this, null);
         if (service.isAvailable() == false) {
             Toast.makeText(this, R.string.toast_msg_bluetooth_not_available, Toast.LENGTH_SHORT).show();
@@ -82,6 +87,7 @@ public class DeviceListActivity extends Activity {
     private void doDiscovery() {
         if (service.isBTopen()) {
             scanButton.setVisibility(View.GONE);
+            progress.setVisibility(View.VISIBLE);
             // If we're already discovering, stop it
             if (service.isDiscovering()) {
                 service.cancelDiscovery();
@@ -143,16 +149,19 @@ public class DeviceListActivity extends Activity {
             // When discovery finds a device
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                // If it's already paired, skip it, because it's been listed already
-                if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
-                    devicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+                String item = device.getName() + "\n" + device.getAddress();
+                // If it's already paired or already listed, skip it!!!
+                if (device.getBondState() != BluetoothDevice.BOND_BONDED &&
+                        devicesArrayAdapter.getPosition(item) == -1) {
+                    devicesArrayAdapter.add(item);
                 }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                setProgressBarIndeterminateVisibility(false);
-                setTitle(R.string.select_device);
+                progress.setVisibility(View.GONE);
+                scanButton.setVisibility(View.VISIBLE);
                 if (devicesArrayAdapter.getCount() == 0) {
-                    String noDevices = getResources().getText(R.string.none_found).toString();
-                    devicesArrayAdapter.add(noDevices);
+                    if(devicesArrayAdapter.isEmpty()) {
+                        devicesArrayAdapter.add(getResources().getText(R.string.no_devices_found).toString());
+                    }
                 }
             }
         }

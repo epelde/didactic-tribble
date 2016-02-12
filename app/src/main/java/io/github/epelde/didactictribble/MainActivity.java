@@ -36,10 +36,17 @@ public class MainActivity extends Activity {
                         getString(R.string.KEY_PRINTER_ADRESS), null);
                 // checking if there is mac address stored
                 if (address == null) {
-                    Toast.makeText(MainActivity.this, R.string.toast_msg_no_printer, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.toast_msg_printer_no_configured, Toast.LENGTH_SHORT).show();
                 } else {
-
+                    Toast.makeText(MainActivity.this, address, Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+        Button scanBtn = (Button) findViewById(R.id.scan_button);
+        scanBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }
@@ -55,6 +62,7 @@ public class MainActivity extends Activity {
                     SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
                     editor.putString(getString(R.string.KEY_PRINTER_ADRESS), address);
                     editor.commit();
+                    Toast.makeText(MainActivity.this, R.string.toast_msg_printer_configured, Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
