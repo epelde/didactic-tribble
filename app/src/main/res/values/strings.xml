@@ -36,7 +36,8 @@
     <!-- Button texts -->
     <string name="button_config">Configurar impresora</string>
     <string name="button_print">Imprimir ticket</string>
-    <string name="button_scan_code">Validar ticket</string>
+    <string name="button_validate_ticket">Validar ticket</string>
+    <string name="button_scan_code">Escanear código</string>
     <string name="button_scan_devices">Buscar impresora</string>
 
 </resources>

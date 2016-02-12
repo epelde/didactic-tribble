@@ -14,7 +14,7 @@
             android:id="@+id/scan_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/button_scan_code" />
+            android:text="@string/button_validate_ticket" />
 
         <Button
             android:id="@+id/print_button"
