@@ -1,24 +1,5 @@
 <resources>
-    <string name="app_name">Ticket Demo</string>
-    <!--
-
-
-
-    <string name="none_paired">No devices have been paired</string>
-    <string name="scanning">scanning for devices...</string>
-    <string name="select_device">select a device to connect</string>
-
-    <string name="btnSearch">Connect  Bluetooth  Printer</string>
-    <string name="btnSend">Print</string>
-    <string name="btn_test">Print  Test  Page</string>
-    <string name="btnClose">Close</string>
-    <string name="txt_content">&quot;&quot;</string>
-    <string name="menu_settings">set</string>
-    <string name="strLang">en</string>
-
-    <string name="msg_no_printer">No hay impresora configurada</string>
-    <string name="msg_bluetooth_enabled">Bluetooth activado</string>
-    -->
+    <string name="app_name">Bizkaidendak Demo</string>
 
     <!-- Key for storing device's MAC address -->
     <string name="KEY_PRINTER_ADRESS">key_printer_address</string>
