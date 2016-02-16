@@ -4,6 +4,10 @@
     <!-- Key for storing device's MAC address -->
     <string name="KEY_PRINTER_ADRESS">key_printer_address</string>
 
+    <!-- Menu (action) items -->
+    <string name="menu_preferences">Preferencias</string>
+
+    <!-- Messages-->
     <string name="no_devices_found">No se ha encontrado ningún dispositivo Bluetooth</string>
     <string name="valid_ticket">Ticket validado</string>
     <string name="invalid_ticket">Ticket no válido</string>

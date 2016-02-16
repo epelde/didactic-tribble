@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -62,6 +65,24 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, R.string.toast_msg_printer_configured, Toast.LENGTH_SHORT).show();
                 }
                 break;
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.menu_preferences:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
