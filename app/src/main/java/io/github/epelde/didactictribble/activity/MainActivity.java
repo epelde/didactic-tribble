@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
-            case R.id.menu_preferences:
+            case R.id.menu_settings:
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

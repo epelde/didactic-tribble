@@ -5,7 +5,7 @@
     <string name="KEY_PRINTER_ADRESS">key_printer_address</string>
 
     <!-- Menu (action) items -->
-    <string name="menu_preferences">Preferencias</string>
+    <string name="menu_settings">Ajustes</string>
 
     <!-- Messages-->
     <string name="no_devices_found">No se ha encontrado ningún dispositivo Bluetooth</string>
