@@ -126,10 +126,7 @@ public class BarcodeScanner extends Activity {
                 BarcodeScanner.this.camera.stopPreview();
                 SymbolSet syms = scanner.getResults();
                 for (Symbol sym : syms) {
-                    String scanResult = sym.getData().trim();
-                    //showAlertDialog(scanResult);
-                    Log.i(LOG_TAG, "* * * CODE:" + scanResult);
-                    new ValidateTicketTask().execute(scanResult);
+                    new ValidateTicketTask().execute(sym.getData().trim());
                     barcodeScanned = true;
                     break;
                 }
@@ -158,7 +155,7 @@ public class BarcodeScanner extends Activity {
             .setMessage(message)
             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-
+                    BarcodeScanner.this.finish();
                 }
             }).show();
     }
