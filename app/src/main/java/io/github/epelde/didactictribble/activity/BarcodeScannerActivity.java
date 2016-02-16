@@ -1,11 +1,13 @@
 package io.github.epelde.didactictribble.activity;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -167,10 +169,13 @@ public class BarcodeScannerActivity extends AppCompatActivity {
 
     private class ValidateTicketTask extends AsyncTask<String, Void, Boolean> {
         @Override
-        protected Boolean doInBackground(String... code) {
+        protected Boolean doInBackground(String... params) {
             Boolean valid = Boolean.FALSE;
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(BarcodeScannerActivity.this);
+            String code = sharedPref.getString("pref_param_code", "");
+            String key = sharedPref.getString("pref_param_key", "");
             KobazuloService service = KobazuloService.Factory.create();
-            Call<Results> call = service.validateTicket(code[0]);
+            Call<Results> call = service.validateTicket(code, key, params[0]);
             try {
                 Response<Results> response = call.execute();
                 Results results = response.body();

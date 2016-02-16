@@ -11,11 +11,12 @@ import retrofit.http.Query;
  */
 public interface KobazuloService {
 
-    @GET("/clientes/fidelizacion/generar_ticket.asp?Pais=ES&Codigo=480040010002&Clave=144339&Idioma=ES")
-    public Call<TicketCollection> generateTicket();
+    @GET("/clientes/fidelizacion/generar_ticket.asp?Pais=ES&Idioma=ES")
+    public Call<TicketCollection> generateTicket(@Query("Codigo") String code, @Query("Clave") String key);
 
-    @GET("/clientes/fidelizacion/comprobar_ticket.asp?Pais=ES&Codigo=480040010002&Clave=144339&Idioma=ES")
-    public Call<Results> validateTicket(@Query("CodigoTicket") String code);
+    @GET("/clientes/fidelizacion/comprobar_ticket.asp?Pais=ES&Idioma=ES")
+    public Call<Results> validateTicket(@Query("Codigo") String code, @Query("Clave") String key,
+                                        @Query("CodigoTicket") String codeTicket);
 
     class Factory {
         public static KobazuloService create() {

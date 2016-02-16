@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:defaultValue="480040010002"
+        android:inputType="text"
+        android:key="pref_param_code"
+        android:title="Código" />
+
+    <EditTextPreference
+        android:defaultValue="144339"
+        android:inputType="text"
+        android:key="pref_param_key"
+        android:title="Clave" />
+</PreferenceScreen>

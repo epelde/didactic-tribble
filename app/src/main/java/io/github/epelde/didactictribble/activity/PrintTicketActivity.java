@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -162,8 +163,13 @@ public class PrintTicketActivity extends AppCompatActivity {
         @Override
         protected Ticket doInBackground(Void... params) {
             Ticket t = null;
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(PrintTicketActivity.this);
+            String code = sharedPref.getString("pref_param_code", "");
+            String key = sharedPref.getString("pref_param_key", "");
+            Log.i(LOG_TAG, "* * * code:" + code);
+            Log.i(LOG_TAG, "* * * key:" + key);
             KobazuloService service = KobazuloService.Factory.create();
-            Call<TicketCollection> call = service.generateTicket();
+            Call<TicketCollection> call = service.generateTicket(code, key);
             try {
                 Response<TicketCollection> response = call.execute();
                 TicketCollection collection = response.body();
