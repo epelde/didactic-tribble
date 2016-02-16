@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
         printBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(v.getContext(), PrintTicket.class));
+                startActivity(new Intent(v.getContext(), PrintTicketActivity.class));
             }
         });
         Button scanBtn = (Button) findViewById(R.id.scan_button);

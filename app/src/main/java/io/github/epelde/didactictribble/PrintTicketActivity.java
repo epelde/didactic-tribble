@@ -35,9 +35,9 @@ import retrofit.Response;
 /**
  * Created by epelde on 15/02/2016.
  */
-public class PrintTicket extends Activity {
+public class PrintTicketActivity extends Activity {
 
-    private static final String LOG_TAG = PrintTicket.class.getSimpleName();
+    private static final String LOG_TAG = PrintTicketActivity.class.getSimpleName();
 
     private static final int REQUEST_CODE_ENABLE_BT = 1;
     private BluetoothService service = null;

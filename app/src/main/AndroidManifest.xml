@@ -35,7 +35,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".PrintTicket"
+            android:name=".PrintTicketActivity"
             android:screenOrientation="portrait" />
     </application>
 
