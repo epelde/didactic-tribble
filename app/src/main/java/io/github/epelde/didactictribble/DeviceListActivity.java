@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -23,7 +24,7 @@ import com.zj.btsdk.BluetoothService;
 
 import java.util.Set;
 
-public class DeviceListActivity extends Activity {
+public class DeviceListActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_ENABLE_BT = 1;
     public static final String EXTRA_DEVICE_ADDRESS = "didactictribble.device_address";

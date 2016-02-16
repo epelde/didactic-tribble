@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -35,7 +36,7 @@ import retrofit.Response;
 /**
  * Created by epelde on 15/02/2016.
  */
-public class PrintTicketActivity extends Activity {
+public class PrintTicketActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = PrintTicketActivity.class.getSimpleName();
 

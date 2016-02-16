@@ -1,6 +1,5 @@
 package io.github.epelde.didactictribble;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
@@ -8,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -29,9 +29,9 @@ import retrofit.Response;
 /**
  * Created by epelde on 12/02/2016.
  */
-public class BarcodeScanner extends Activity {
+public class BarcodeScannerActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = BarcodeScanner.class.getSimpleName();
+    private static final String LOG_TAG = BarcodeScannerActivity.class.getSimpleName();
 
     private Camera camera;
     private CameraPreview mPreview;
@@ -59,7 +59,7 @@ public class BarcodeScanner extends Activity {
             scanner.setConfig(0, Config.X_DENSITY, 3);
             scanner.setConfig(0, Config.Y_DENSITY, 3);
 
-            mPreview = new CameraPreview(BarcodeScanner.this, camera, previewCb,
+            mPreview = new CameraPreview(BarcodeScannerActivity.this, camera, previewCb,
                     autoFocusCB);
             FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
             preview.addView(mPreview);
@@ -122,8 +122,8 @@ public class BarcodeScanner extends Activity {
             int result = scanner.scanImage(barcode);
             if (result != 0) {
                 previewing = false;
-                BarcodeScanner.this.camera.setPreviewCallback(null);
-                BarcodeScanner.this.camera.stopPreview();
+                BarcodeScannerActivity.this.camera.setPreviewCallback(null);
+                BarcodeScannerActivity.this.camera.stopPreview();
                 SymbolSet syms = scanner.getResults();
                 for (Symbol sym : syms) {
                     new ValidateTicketTask().execute(sym.getData().trim());
@@ -155,7 +155,7 @@ public class BarcodeScanner extends Activity {
             .setMessage(message)
             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    BarcodeScanner.this.finish();
+                    BarcodeScannerActivity.this.finish();
                 }
             }).show();
     }

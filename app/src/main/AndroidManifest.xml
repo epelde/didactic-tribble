@@ -31,7 +31,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".BarcodeScanner"
+            android:name=".BarcodeScannerActivity"
             android:screenOrientation="portrait" />
 
         <activity
