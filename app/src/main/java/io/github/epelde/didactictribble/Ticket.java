@@ -1,17 +1,31 @@
 package io.github.epelde.didactictribble;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by epelde on 03/02/2016.
  */
 public class Ticket {
 
+    @SerializedName("FechaHora")
     private String date;
+
+    @SerializedName("NombreComercio")
     private String name;
+
+    @SerializedName("DireccionComercio")
     private String address;
+
+    @SerializedName("DescripcionOferta")
     private String description;
-    private String codeUrl;
+
+    @SerializedName("CodigoTicket")
     private String code;
-    private byte [] image;
+
+    @SerializedName("UrlQr")
+    private String codeURL;
+
+    private byte[] imageFile;
 
     public String getDate() {
         return date;
@@ -45,14 +59,6 @@ public class Ticket {
         this.description = description;
     }
 
-    public String getCodeUrl() {
-        return codeUrl;
-    }
-
-    public void setCodeUrl(String codeUrl) {
-        this.codeUrl = codeUrl;
-    }
-
     public String getCode() {
         return code;
     }
@@ -61,11 +67,19 @@ public class Ticket {
         this.code = code;
     }
 
-    public byte[] getImage() {
-        return image;
+    public String getCodeURL() {
+        return codeURL;
     }
 
-    public void setImage(byte[] image) {
-        this.image = image;
+    public void setCodeURL(String codeURL) {
+        this.codeURL = codeURL;
+    }
+
+    public byte[] getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(byte[] imageFile) {
+        this.imageFile = imageFile;
     }
 }

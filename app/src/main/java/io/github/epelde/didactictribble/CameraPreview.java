@@ -12,6 +12,9 @@ import java.io.IOException;
  * Created by epelde on 12/02/2016.
  */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+
+    private static final String LOG_TAG = CameraPreview.class.getSimpleName();
+
     private SurfaceHolder mHolder;
     private Camera mCamera;
     private Camera.PreviewCallback previewCallback;
@@ -44,24 +47,22 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // underlying surface is created and destroyed.
         mHolder = getHolder();
         mHolder.addCallback(this);
-
         // deprecated setting, but required on Android versions prior to 3.0
-        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        //mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-
         try {
             mCamera.setPreviewDisplay(holder);
         } catch (IOException e) {
-            Log.d("DBG", "Error setting camera preview: " + e.getMessage());
+            Log.e(LOG_TAG, "Error setting camera preview: " + e.getMessage());
         }
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
- /*
+        /*
          * If your preview can change or rotate, take care of those events here.
          * Make sure to stop the preview before resizing or reformatting it.
          */
@@ -80,13 +81,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         try {
             // Hard code camera surface rotation 90 degs to match Activity view in portrait
             mCamera.setDisplayOrientation(90);
-
             mCamera.setPreviewDisplay(mHolder);
             mCamera.setPreviewCallback(previewCallback);
             mCamera.startPreview();
             mCamera.autoFocus(autoFocusCallback);
         } catch (Exception e) {
-            Log.d("DBG", "Error starting camera preview: " + e.getMessage());
+            Log.d(LOG_TAG, "Error starting camera preview: " + e.getMessage());
         }
     }
 

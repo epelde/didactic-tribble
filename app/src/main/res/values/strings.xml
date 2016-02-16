@@ -1,10 +1,7 @@
 <resources>
     <string name="app_name">Ticket Demo</string>
-    <string name="btn_connect">Conectar impresora</string>
+    <!--
 
-    <string name="msg_connected">Conectado a la impresora</string>
-    <string name="msg_connection_lost">Se ha perdido la conexión con la impresora</string>
-    <string name="msg_unable_connect">No se ha podido conectar con la impresora</string>
 
 
     <string name="none_paired">No devices have been paired</string>
@@ -21,17 +18,22 @@
 
     <string name="msg_no_printer">No hay impresora configurada</string>
     <string name="msg_bluetooth_enabled">Bluetooth activado</string>
+    -->
 
     <!-- Key for storing device's MAC address -->
     <string name="KEY_PRINTER_ADRESS">key_printer_address</string>
 
     <string name="no_devices_found">No se ha encontrado ningún dispositivo Bluetooth</string>
+    <string name="valid_ticket">Ticket validado</string>
+    <string name="invalid_ticket">Ticket no válido</string>
 
     <!-- Toast messages displayed to the user -->
     <string name="toast_msg_printer_no_configured">Debes configurar una impresora</string>
     <string name="toast_msg_printer_configured">Impresora configurada</string>
     <string name="toast_msg_bluetooth_not_available">Bluetooth no disponible</string>
     <string name="toast_msg_must_enable_bluetooth">Debes activar el Bluetooth del dispositivo</string>
+    <string name="toast_msg_unable_connect_device">No se puede conectar con la impresora</string>
+    <string name="toast_msg_connection_lost">Se ha perdido la conexión con la impresora</string>
 
     <!-- Button texts -->
     <string name="button_config">Configurar impresora</string>

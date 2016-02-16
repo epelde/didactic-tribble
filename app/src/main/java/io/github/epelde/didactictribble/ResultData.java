@@ -1,5 +1,7 @@
 package io.github.epelde.didactictribble;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 /**
@@ -7,8 +9,13 @@ import java.io.Serializable;
  */
 public class ResultData implements Serializable {
 
+    @SerializedName("FechaHora")
     private String date;
+
+    @SerializedName("OfertaValida")
     private String valid;
+
+    @SerializedName("TextoError")
     private String error;
 
     public String getDate() {
@@ -34,4 +41,5 @@ public class ResultData implements Serializable {
     public void setError(String error) {
         this.error = error;
     }
+
 }

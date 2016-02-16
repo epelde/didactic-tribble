@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -24,7 +25,7 @@ public class MainActivity extends Activity {
         configBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(MainActivity.this, DeviceListActivity.class),
+                startActivityForResult(new Intent(v.getContext(), DeviceListActivity.class),
                         REQUEST_CODE_SELECT_DEVICE);
             }
         });
@@ -32,14 +33,7 @@ public class MainActivity extends Activity {
         printBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String address = getPreferences(MODE_PRIVATE).getString(
-                        getString(R.string.KEY_PRINTER_ADRESS), null);
-                // checking if there is mac address stored
-                if (address == null) {
-                    Toast.makeText(MainActivity.this, R.string.toast_msg_printer_no_configured, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(MainActivity.this, address, Toast.LENGTH_SHORT).show();
-                }
+                startActivity(new Intent(v.getContext(), PrintTicket.class));
             }
         });
         Button scanBtn = (Button) findViewById(R.id.scan_button);
@@ -59,7 +53,7 @@ public class MainActivity extends Activity {
                 if (resultCode == Activity.RESULT_OK) {
                     String address = data.getExtras()
                             .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-                    SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
                     editor.putString(getString(R.string.KEY_PRINTER_ADRESS), address);
                     editor.commit();
                     Toast.makeText(MainActivity.this, R.string.toast_msg_printer_configured, Toast.LENGTH_SHORT).show();

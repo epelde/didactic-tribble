@@ -21,6 +21,7 @@ import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 
 import java.io.IOException;
+import java.util.List;
 
 import retrofit.Call;
 import retrofit.Response;
@@ -32,12 +33,11 @@ public class BarcodeScanner extends Activity {
 
     private static final String LOG_TAG = BarcodeScanner.class.getSimpleName();
 
-    private Camera mCamera;
+    private Camera camera;
     private CameraPreview mPreview;
     private Handler autoFocusHandler;
-
-    private Button scanButton;
     private ImageScanner scanner;
+    private Button scanButton;
 
     private boolean barcodeScanned = false;
     private boolean previewing = true;
@@ -51,33 +51,33 @@ public class BarcodeScanner extends Activity {
 
     private void initControls() {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
         autoFocusHandler = new Handler();
-        mCamera = getCameraInstance();
+        camera = getCameraInstance();
+        if (camera != null) {
+            // Instance barcode scanner
+            scanner = new ImageScanner();
+            scanner.setConfig(0, Config.X_DENSITY, 3);
+            scanner.setConfig(0, Config.Y_DENSITY, 3);
 
-        // Instance barcode scanner
-        scanner = new ImageScanner();
-        scanner.setConfig(0, Config.X_DENSITY, 3);
-        scanner.setConfig(0, Config.Y_DENSITY, 3);
+            mPreview = new CameraPreview(BarcodeScanner.this, camera, previewCb,
+                    autoFocusCB);
+            FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+            preview.addView(mPreview);
 
-        mPreview = new CameraPreview(BarcodeScanner.this, mCamera, previewCb,
-                autoFocusCB);
-        FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreview);
-        preview.addView(mPreview);
+            scanButton = (Button) findViewById(R.id.scan_button);
 
-        scanButton = (Button) findViewById(R.id.ScanButton);
-
-        scanButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (barcodeScanned) {
-                    barcodeScanned = false;
-                    mCamera.setPreviewCallback(previewCb);
-                    mCamera.startPreview();
-                    previewing = true;
-                    mCamera.autoFocus(autoFocusCB);
+            scanButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    if (barcodeScanned) {
+                        barcodeScanned = false;
+                        camera.setPreviewCallback(previewCb);
+                        camera.startPreview();
+                        previewing = true;
+                        camera.autoFocus(autoFocusCB);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
@@ -88,68 +88,59 @@ public class BarcodeScanner extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        releaseCamera();
+    }
 
-    /**
-     * A safe way to get an instance of the Camera object.
-     */
-    public static Camera getCameraInstance() {
+    private static Camera getCameraInstance() {
         Camera c = null;
         try {
             c = Camera.open();
         } catch (Exception e) {
+            Log.e(LOG_TAG, "Camera is not available (it's in use or does not exist)");
         }
         return c;
     }
 
     private void releaseCamera() {
-        if (mCamera != null) {
+        if (camera != null) {
             previewing = false;
-            mCamera.setPreviewCallback(null);
-            mCamera.release();
-            mCamera = null;
+            camera.setPreviewCallback(null);
+            camera.release();
+            camera = null;
         }
     }
-
-    private Runnable doAutoFocus = new Runnable() {
-        public void run() {
-            if (previewing)
-                mCamera.autoFocus(autoFocusCB);
-        }
-    };
 
     Camera.PreviewCallback previewCb = new Camera.PreviewCallback() {
         public void onPreviewFrame(byte[] data, Camera camera) {
             Camera.Parameters parameters = camera.getParameters();
             Camera.Size size = parameters.getPreviewSize();
-
             Image barcode = new Image(size.width, size.height, "Y800");
             barcode.setData(data);
-
             int result = scanner.scanImage(barcode);
-
             if (result != 0) {
                 previewing = false;
-                mCamera.setPreviewCallback(null);
-                mCamera.stopPreview();
-
+                BarcodeScanner.this.camera.setPreviewCallback(null);
+                BarcodeScanner.this.camera.stopPreview();
                 SymbolSet syms = scanner.getResults();
                 for (Symbol sym : syms) {
-
-                    Log.i("<<<<<<Asset Code>>>>> ",
-                            "<<<<Bar Code>>> " + sym.getData());
                     String scanResult = sym.getData().trim();
-                    showAlertDialog(scanResult);
-
-              /*  Toast.makeText(BarcodeScanner.this, scanResult,
-                        Toast.LENGTH_SHORT).show();*/
-
-                    //new ValidateTicketTask().execute(scanResult);
-
+                    //showAlertDialog(scanResult);
+                    Log.i(LOG_TAG, "* * * CODE:" + scanResult);
+                    new ValidateTicketTask().execute(scanResult);
                     barcodeScanned = true;
-
                     break;
                 }
             }
+        }
+    };
+
+    private Runnable doAutoFocus = new Runnable() {
+        public void run() {
+            if (previewing)
+                camera.autoFocus(autoFocusCB);
         }
     };
 
@@ -172,25 +163,31 @@ public class BarcodeScanner extends Activity {
             }).show();
     }
 
-    private class ValidateTicketTask extends AsyncTask<String, Void, Void> {
-
+    private class ValidateTicketTask extends AsyncTask<String, Void, Boolean> {
         @Override
-        protected Void doInBackground(String... code) {
-            Log.i(LOG_TAG, "* * * CODE:" + code);
+        protected Boolean doInBackground(String... code) {
+            Boolean valid = Boolean.FALSE;
             KobazuloService service = KobazuloService.Factory.create();
             Call<Results> call = service.validateTicket(code[0]);
             try {
                 Response<Results> response = call.execute();
-                Log.i(LOG_TAG, "* * * RESPONSE SUCCESS:" + response.isSuccess());
                 Results results = response.body();
-                Log.i(LOG_TAG, "* * * RESULTS:" + results.getData().size());
-                for (ResultData d : results.getData()) {
-                    Log.i(LOG_TAG, "* * * DATA:" + d.getError());
+                List<ResultData> data =  results.getData();
+                if (data.get(0).getValid().equals("True")) {
+                    valid = Boolean.TRUE;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return null;
+            return valid;
+        }
+
+        protected void onPostExecute(Boolean valid) {
+            if (valid) {
+                showAlertDialog(getString(R.string.valid_ticket));
+            } else {
+                showAlertDialog(getString(R.string.invalid_ticket));
+            }
         }
     }
 }
