@@ -1,4 +1,4 @@
-package io.github.epelde.didactictribble;
+package io.github.epelde.didactictribble.activity;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -30,6 +30,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import io.github.epelde.didactictribble.Commands;
+import io.github.epelde.didactictribble.ImageFetcher;
+import io.github.epelde.didactictribble.KobazuloService;
+import io.github.epelde.didactictribble.R;
+import io.github.epelde.didactictribble.Ticket;
+import io.github.epelde.didactictribble.TicketCollection;
 import retrofit.Call;
 import retrofit.Response;
 

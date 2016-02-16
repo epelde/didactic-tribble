@@ -1,4 +1,4 @@
-package io.github.epelde.didactictribble;
+package io.github.epelde.didactictribble.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import io.github.epelde.didactictribble.R;
 
 /**
  * Created by epelde on 08/02/2016.

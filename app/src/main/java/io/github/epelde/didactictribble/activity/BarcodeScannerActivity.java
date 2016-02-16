@@ -1,4 +1,4 @@
-package io.github.epelde.didactictribble;
+package io.github.epelde.didactictribble.activity;
 
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
@@ -23,6 +23,11 @@ import net.sourceforge.zbar.SymbolSet;
 import java.io.IOException;
 import java.util.List;
 
+import io.github.epelde.didactictribble.CameraPreview;
+import io.github.epelde.didactictribble.KobazuloService;
+import io.github.epelde.didactictribble.R;
+import io.github.epelde.didactictribble.ResultData;
+import io.github.epelde.didactictribble.Results;
 import retrofit.Call;
 import retrofit.Response;
 

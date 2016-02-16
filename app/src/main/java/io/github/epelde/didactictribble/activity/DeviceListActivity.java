@@ -1,4 +1,4 @@
-package io.github.epelde.didactictribble;
+package io.github.epelde.didactictribble.activity;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -23,6 +23,8 @@ import android.widget.Toast;
 import com.zj.btsdk.BluetoothService;
 
 import java.util.Set;
+
+import io.github.epelde.didactictribble.R;
 
 public class DeviceListActivity extends AppCompatActivity {
 
