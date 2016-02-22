@@ -175,6 +175,9 @@ public class PrintTicketActivity extends AppCompatActivity {
                 TicketCollection collection = response.body();
                 if (!collection.getData().isEmpty()) {
                     t = collection.getData().get(0);
+                    Log.d(LOG_TAG, "* * * " + t.getCode());
+                    Log.d(LOG_TAG, "* * * " + t.getDescription());
+                    Log.d(LOG_TAG, "* * * " + t.getCodeURL());
                     byte[] imgBytes = new ImageFetcher().getUrlBytes(t.getCodeURL());
                     t.setImageFile(imgBytes);
                 }
