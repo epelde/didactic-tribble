@@ -167,10 +167,10 @@ public class BarcodeScannerActivity extends AppCompatActivity {
             }).show();
     }
 
-    private class ValidateTicketTask extends AsyncTask<String, Void, Boolean> {
+    private class ValidateTicketTask extends AsyncTask<String, Void, String> {
         @Override
-        protected Boolean doInBackground(String... params) {
-            Boolean valid = Boolean.FALSE;
+        protected String doInBackground(String... params) {
+            String msg = "";
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(BarcodeScannerActivity.this);
             String code = sharedPref.getString("pref_param_code", "");
             String key = sharedPref.getString("pref_param_key", "");
@@ -180,21 +180,15 @@ public class BarcodeScannerActivity extends AppCompatActivity {
                 Response<Results> response = call.execute();
                 Results results = response.body();
                 List<ResultData> data =  results.getData();
-                if (data.get(0).getValid().equals("True")) {
-                    valid = Boolean.TRUE;
-                }
+                msg = data.get(0).getError();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return valid;
+            return msg;
         }
 
-        protected void onPostExecute(Boolean valid) {
-            if (valid) {
-                showAlertDialog(getString(R.string.valid_ticket));
-            } else {
-                showAlertDialog(getString(R.string.invalid_ticket));
-            }
+        protected void onPostExecute(String msg) {
+            showAlertDialog(msg);
         }
     }
 }

@@ -13,7 +13,7 @@ public class ResultData implements Serializable {
     private String date;
 
     @SerializedName("OfertaValida")
-    private String valid;
+    private Boolean valid;
 
     @SerializedName("TextoError")
     private String error;
@@ -26,11 +26,11 @@ public class ResultData implements Serializable {
         this.date = date;
     }
 
-    public String getValid() {
+    public Boolean getValid() {
         return valid;
     }
 
-    public void setValid(String valid) {
+    public void setValid(Boolean valid) {
         this.valid = valid;
     }
 
