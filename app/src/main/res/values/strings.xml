@@ -1,11 +1,12 @@
 <resources>
-    <string name="app_name">Bizkaidendak Demo</string>
+    <string name="app_name">Bizkaidendak</string>
 
     <!-- Key for storing device's MAC address -->
     <string name="KEY_PRINTER_ADRESS">key_printer_address</string>
 
     <!-- Menu (action) items -->
     <string name="menu_settings">Ajustes</string>
+    <string name="menu_conf_printer">Configurar impresora</string>
 
     <!-- Messages-->
     <string name="no_devices_found">No se ha encontrado ningún dispositivo Bluetooth</string>

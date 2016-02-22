@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,14 +28,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button configBtn = (Button) findViewById(R.id.config_button);
-        configBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(new Intent(v.getContext(), DeviceListActivity.class),
-                        REQUEST_CODE_SELECT_DEVICE);
-            }
-        });
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         Button printBtn = (Button) findViewById(R.id.print_button);
         printBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
         switch(item.getItemId()) {
             case R.id.menu_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.menu_conf_printer:
+                startActivityForResult(new Intent(MainActivity.this, DeviceListActivity.class),
+                        REQUEST_CODE_SELECT_DEVICE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
