@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,11 +18,23 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.zj.btsdk.BluetoothService;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import io.github.epelde.didactictribble.Commands;
+import io.github.epelde.didactictribble.ImageFetcher;
+import io.github.epelde.didactictribble.KobazuloService;
 import io.github.epelde.didactictribble.R;
+import io.github.epelde.didactictribble.Ticket;
+import io.github.epelde.didactictribble.TicketCollection;
+import retrofit.Call;
+import retrofit.Response;
 
 /**
  * Created by epelde on 08/02/2016.
@@ -32,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_ENABLE_BT = 2;
 
     private BluetoothService service = null;
+    private ProgressBar progress;
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -41,25 +55,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         service = new BluetoothService(this, mHandler);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        progress = (ProgressBar) findViewById(R.id.progress);
         Button printBtn = (Button) findViewById(R.id.print_button);
         printBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(v.getContext(), PrintTicketActivity.class));
-                if (service.isDiscovering())
-                    service.cancelDiscovery();
-                if (service.isAvailable() == false) {
-                    Toast.makeText(MainActivity.this, R.string.toast_msg_bluetooth_not_available,
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    if (service.isBTopen() == false) {
-                        startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
-                                REQUEST_CODE_ENABLE_BT);
-                    } else {
-                        setConnection();
-                    }
+                if (checkBT()) {
+                    setConnection();
                 }
-
             }
         });
         Button scanBtn = (Button) findViewById(R.id.scan_button);
@@ -89,9 +92,9 @@ public class MainActivity extends AppCompatActivity {
                 if (resultCode == RESULT_CANCELED) {
                     Toast.makeText(this, R.string.toast_msg_must_enable_bluetooth,
                             Toast.LENGTH_SHORT).show();
-                    finish();
                 } else {
-                    setConnection();
+                    Toast.makeText(this, R.string.toast_msg_bluetooth_enabled,
+                            Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -107,17 +110,37 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.menu_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             case R.id.menu_conf_printer:
-                startActivityForResult(new Intent(MainActivity.this, DeviceListActivity.class),
-                        REQUEST_CODE_SELECT_DEVICE);
+                if (checkBT()) {
+                    startActivityForResult(new Intent(MainActivity.this, DeviceListActivity.class),
+                            REQUEST_CODE_SELECT_DEVICE);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private boolean checkBT() {
+        if (service.isDiscovering()) {
+            service.cancelDiscovery();
+        }
+        if (service.isAvailable() == false) {
+            Toast.makeText(MainActivity.this, R.string.toast_msg_bluetooth_not_available,
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            if (service.isBTopen() == false) {
+                startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
+                        REQUEST_CODE_ENABLE_BT);
+                return false;
+            }
+        }
+        return true;
     }
 
     private void setConnection() {
@@ -126,8 +149,15 @@ public class MainActivity extends AppCompatActivity {
         if (address == null) {
             Toast.makeText(this, R.string.toast_msg_printer_no_configured, Toast.LENGTH_SHORT).show();
         } else {
-            BluetoothDevice device  = service.getDevByMac(address);
-            service.connect(device);
+            service.start();
+            BluetoothDevice device = service.getDevByMac(address);
+            if (device != null) {
+                Log.i(LOG_TAG, "* * * DEVICE:" + device.getName());
+                progress.setVisibility(View.VISIBLE);
+                Toast.makeText(this, R.string.toast_msg_connecting, Toast.LENGTH_SHORT)
+                        .show();
+                service.connect(device);
+            }
         }
     }
 
@@ -138,27 +168,132 @@ public class MainActivity extends AppCompatActivity {
                 case BluetoothService.MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case BluetoothService.STATE_CONNECTED:
-                            //connected = Boolean.TRUE;
-                            //progress.setVisibility(View.VISIBLE);
-                            //new GenerateTicketTask().execute();
-                            Toast.makeText(MainActivity.this, "DEVICE CONNECTED", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, R.string.toast_msg_generating_ticket, Toast.LENGTH_SHORT)
+                                    .show();
+                            new GenerateTicketTask().execute();
                             break;
                     }
                     break;
                 case BluetoothService.MESSAGE_CONNECTION_LOST:
-                    //progress.setVisibility(View.GONE);
-                    Toast.makeText(getApplicationContext(), R.string.toast_msg_connection_lost,
-                            Toast.LENGTH_SHORT).show();
-                    finish();
+                    progress.setVisibility(View.GONE);
+                    //Toast.makeText(getApplicationContext(), R.string.toast_msg_connection_lost,
+                    //        Toast.LENGTH_SHORT).show();
+                    service.stop();
                     break;
                 case BluetoothService.MESSAGE_UNABLE_CONNECT:
-                    //progress.setVisibility(View.GONE);
-                    Toast.makeText(getApplicationContext(), R.string.toast_msg_unable_connect_device,
-                            Toast.LENGTH_SHORT).show();
-                    finish();
+                    progress.setVisibility(View.GONE);
+                    //Toast.makeText(getApplicationContext(), R.string.toast_msg_unable_connect_device,
+                    //        Toast.LENGTH_SHORT).show();
+                    service.stop();
                     break;
             }
         }
     };
+
+    private class GenerateTicketTask extends AsyncTask<Void, Void, Integer> {
+        @Override
+        protected Integer doInBackground(Void... params) {
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+            String code = sharedPref.getString("pref_param_code", "");
+            String key = sharedPref.getString("pref_param_key", "");
+            Log.i(LOG_TAG, "* * * code:" + code);
+            Log.i(LOG_TAG, "* * * key:" + key);
+            KobazuloService service = KobazuloService.Factory.create();
+            Call<TicketCollection> call = service.generateTicket(code, key);
+            try {
+                Response<TicketCollection> response = call.execute();
+                if (response.isSuccess()) {
+                    Log.i(LOG_TAG, "* * * RESPONSE SUCCESS");
+                    TicketCollection collection = response.body();
+                    if (!collection.getData().isEmpty()) {
+                        Ticket t = collection.getData().get(0);
+                        Log.d(LOG_TAG, "* * * " + t.getDate());
+                        Log.d(LOG_TAG, "* * * " + t.getName());
+                        Log.d(LOG_TAG, "* * * " + t.getAddress());
+                        Log.d(LOG_TAG, "* * * " + t.getDescription());
+                        Log.d(LOG_TAG, "* * * " + t.getCode());
+                        Log.d(LOG_TAG, "* * * " + t.getCodeURL());
+                        byte[] imgBytes = new ImageFetcher().getUrlBytes(t.getCodeURL());
+                        t.setImageFile(imgBytes);
+                        //printTicket(t);
+                    }
+                } else {
+                    return -1;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return -1;
+            }
+            return 0;
+        }
+
+        protected void onPostExecute(Integer code) {
+            progress.setVisibility(View.GONE);
+            service.stop();
+            if (code == -1) {
+                Toast.makeText(MainActivity.this, R.string.toast_msg_printing_ticket_error, Toast.LENGTH_SHORT)
+                        .show();
+            } else {
+                Toast.makeText(MainActivity.this, R.string.toast_msg_printing_ticket_success, Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }
+    }
+
+    private void printTicket(Ticket t) {
+        File tempFile = null;
+        FileOutputStream fos = null;
+        try {
+            tempFile = File.createTempFile("chart", ".png");
+            fos = new FileOutputStream(tempFile);
+            fos.write(t.getImageFile());
+            fos.flush();
+            if (tempFile.exists()) {
+                service.sendMessage("--------------------------------\n\n", "GBK");
+                service.write(Commands.PRINT_SPEED);
+                service.write(Commands.INTERNATIONAL_CHARACTERSET);
+                service.write(Commands.PRINT_ALIGNMENT_CENTER);
+                byte[] cmd = new byte[3];
+                cmd[0] = 0x1b;
+                cmd[1] = 0x21;
+                cmd[2] &= 0xEF;
+                service.write(cmd);
+                service.sendMessage(t.getDate() + "\n", "GBK");
+                service.write(Commands.FONT_BOLD_ON);
+                service.sendMessage(t.getName() + "\n", "GBK");
+                service.write(Commands.FONT_BOLD_OFF);
+                service.sendMessage(t.getAddress() + "\n", "GBK");
+                cmd[2] |= 0x10;
+                service.write(cmd);
+                service.write(Commands.FONT_BOLD_ON);
+                service.sendMessage(t.getDescription() + "\n", "GBK");
+                service.write(Commands.FONT_BOLD_OFF);
+                cmd[2] &= 0xEF;
+                service.write(cmd);
+                service.sendMessage(t.getCode() + "\n", "GBK");
+                /*PrintPic pg = new PrintPic();
+                pg.initCanvas(384);
+                pg.initPaint();
+                pg.drawImage(0, 0, tempFile.getAbsolutePath());
+                service.write(pg.printDraw());
+                */
+                service.sendMessage("--------------------------------\n\n", "GBK");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (tempFile != null && tempFile.exists()) {
+                tempFile.delete();
+            }
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 
 }

@@ -18,8 +18,14 @@
     <string name="toast_msg_printer_configured">Impresora configurada</string>
     <string name="toast_msg_bluetooth_not_available">Bluetooth no disponible</string>
     <string name="toast_msg_must_enable_bluetooth">Debes activar el Bluetooth del dispositivo</string>
+    <string name="toast_msg_bluetooth_enabled">Bluetooth del dispositivo activado</string>
     <string name="toast_msg_unable_connect_device">No se puede conectar con la impresora</string>
     <string name="toast_msg_connection_lost">Se ha perdido la conexión con la impresora</string>
+    <string name="toast_msg_connecting">Conectando con la impresora...</string>
+    <string name="toast_msg_generating_ticket">Generando ticket...</string>
+    <string name="toast_msg_printing_ticket">Imprimiendo ticket...</string>
+    <string name="toast_msg_printing_ticket_success">Ticket impreso correctamente</string>
+    <string name="toast_msg_printing_ticket_error">Ha ocurrido un error imprimiendo ticket</string>
 
     <!-- Button texts -->
     <string name="button_config">Configurar impresora</string>
