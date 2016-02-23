@@ -53,16 +53,17 @@ public class BarcodeScannerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barcode_scanner);
-        //initControls();
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        autoFocusHandler = new Handler();
-        new CameraInstanceTask().execute();
+        initControls();
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //autoFocusHandler = new Handler();
+        //new CameraInstanceTask().execute();
+        //new CameraHandlerThread().start();
     }
 
     private void initControls() {
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        //autoFocusHandler = new Handler();
-        //camera = getCameraInstance();
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        autoFocusHandler = new Handler();
+        camera = getCameraInstance();
         if (camera != null) {
             Log.i(LOG_TAG, "* * * PARECE QUE HAY CAMARA");
             // Instance barcode scanner
@@ -198,6 +199,22 @@ public class BarcodeScannerActivity extends AppCompatActivity {
         }
     }
 
+   /* private class CameraHandlerThread extends android.os.HandlerThread {
+
+        public CameraHandlerThread() {
+            super("CameraThread");
+        }
+
+        @Override
+        public void run() {
+            camera = Camera.open();
+            if (camera != null) {
+                Log.i(LOG_TAG, "* * * CAMERATHREAD!!!!");
+                initControls();
+            }
+        }
+    }
+
     private class CameraInstanceTask extends AsyncTask<Void, Void, Camera> {
         @Override
         protected Camera doInBackground(Void... params) {
@@ -218,5 +235,5 @@ public class BarcodeScannerActivity extends AppCompatActivity {
             camera = c;
             initControls();
         }
-    }
+    }*/
 }

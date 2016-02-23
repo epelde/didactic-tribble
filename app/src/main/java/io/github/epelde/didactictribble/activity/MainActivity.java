@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.zj.btsdk.BluetoothService;
+import com.zj.btsdk.PrintPic;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -258,12 +259,11 @@ public class MainActivity extends AppCompatActivity {
                 cmd[2] &= 0xEF;
                 service.write(cmd);
                 service.sendMessage(t.getCode() + "\n", "GBK");
-                /*PrintPic pg = new PrintPic();
+                PrintPic pg = new PrintPic();
                 pg.initCanvas(384);
                 pg.initPaint();
                 pg.drawImage(0, 0, tempFile.getAbsolutePath());
                 service.write(pg.printDraw());
-                */
                 service.sendMessage("--------------------------------\n\n", "GBK");
             }
         } catch (IOException e) {
