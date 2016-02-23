@@ -53,14 +53,18 @@ public class BarcodeScannerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barcode_scanner);
-        initControls();
+        //initControls();
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        autoFocusHandler = new Handler();
+        new CameraInstanceTask().execute();
     }
 
     private void initControls() {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        autoFocusHandler = new Handler();
-        camera = getCameraInstance();
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //autoFocusHandler = new Handler();
+        //camera = getCameraInstance();
         if (camera != null) {
+            Log.i(LOG_TAG, "* * * PARECE QUE HAY CAMARA");
             // Instance barcode scanner
             scanner = new ImageScanner();
             scanner.setConfig(0, Config.X_DENSITY, 3);
@@ -84,6 +88,8 @@ public class BarcodeScannerActivity extends AppCompatActivity {
                     }
                 }
             });
+        } else {
+            Log.i(LOG_TAG, "* * * PARECE QUE NO HAY CAMARA");
         }
     }
 
@@ -172,8 +178,8 @@ public class BarcodeScannerActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             String msg = "";
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(BarcodeScannerActivity.this);
-            String code = sharedPref.getString("pref_param_code", "");
-            String key = sharedPref.getString("pref_param_key", "");
+            String code = sharedPref.getString(SettingsActivity.CODE_PREF, SettingsActivity.DEFAULT_VALUE);
+            String key = sharedPref.getString(SettingsActivity.KEY_PREF, SettingsActivity.DEFAULT_VALUE);
             KobazuloService service = KobazuloService.Factory.create();
             Call<Results> call = service.validateTicket(code, key, params[0]);
             try {
@@ -189,6 +195,28 @@ public class BarcodeScannerActivity extends AppCompatActivity {
 
         protected void onPostExecute(String msg) {
             showAlertDialog(msg);
+        }
+    }
+
+    private class CameraInstanceTask extends AsyncTask<Void, Void, Camera> {
+        @Override
+        protected Camera doInBackground(Void... params) {
+            try {
+                return Camera.open();
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "Camera is not available (it's in use or does not exist)");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Camera c) {
+            super.onPostExecute(camera);
+            if (c != null) {
+                Log.i(LOG_TAG, "* * * CAMERA");
+            } else Log.i(LOG_TAG, "* * * NULL CAMERA");
+            camera = c;
+            initControls();
         }
     }
 }

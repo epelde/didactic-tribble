@@ -15,9 +15,9 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     private EditTextPreference codeEditTextPref;
     private EditTextPreference keyEditTextPref;
 
-    private static final String CODE_PREF = "pref_param_code";
-    private static final String KEY_PREF = "pref_param_key";
-    private static final String DEFAULT_VALUE = "0";
+    public static final String CODE_PREF = "pref_param_code";
+    public static final String KEY_PREF = "pref_param_key";
+    public static final String DEFAULT_VALUE = "0";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
