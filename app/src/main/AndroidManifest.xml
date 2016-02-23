@@ -33,12 +33,6 @@
             android:name=".activity.BarcodeScannerActivity"
             android:screenOrientation="portrait" />
 
-        <!--
-        <activity
-            android:name=".activity.PrintTicketActivity"
-            android:screenOrientation="portrait" />
-        -->
-
         <activity
             android:name=".activity.SettingsActivity"
             android:screenOrientation="portrait" />

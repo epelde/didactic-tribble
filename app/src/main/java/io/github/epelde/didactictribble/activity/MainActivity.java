@@ -12,7 +12,6 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -152,11 +151,13 @@ public class MainActivity extends AppCompatActivity {
             service.start();
             BluetoothDevice device = service.getDevByMac(address);
             if (device != null) {
-                Log.i(LOG_TAG, "* * * DEVICE:" + device.getName());
                 progress.setVisibility(View.VISIBLE);
                 Toast.makeText(this, R.string.toast_msg_connecting, Toast.LENGTH_SHORT)
                         .show();
                 service.connect(device);
+            } else {
+                Toast.makeText(this, R.string.toast_msg_unable_connect_device, Toast.LENGTH_SHORT)
+                        .show();
             }
         }
     }
@@ -176,14 +177,10 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case BluetoothService.MESSAGE_CONNECTION_LOST:
                     progress.setVisibility(View.GONE);
-                    //Toast.makeText(getApplicationContext(), R.string.toast_msg_connection_lost,
-                    //        Toast.LENGTH_SHORT).show();
                     service.stop();
                     break;
                 case BluetoothService.MESSAGE_UNABLE_CONNECT:
                     progress.setVisibility(View.GONE);
-                    //Toast.makeText(getApplicationContext(), R.string.toast_msg_unable_connect_device,
-                    //        Toast.LENGTH_SHORT).show();
                     service.stop();
                     break;
             }
@@ -196,26 +193,17 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
             String code = sharedPref.getString("pref_param_code", "");
             String key = sharedPref.getString("pref_param_key", "");
-            Log.i(LOG_TAG, "* * * code:" + code);
-            Log.i(LOG_TAG, "* * * key:" + key);
             KobazuloService service = KobazuloService.Factory.create();
             Call<TicketCollection> call = service.generateTicket(code, key);
             try {
                 Response<TicketCollection> response = call.execute();
                 if (response.isSuccess()) {
-                    Log.i(LOG_TAG, "* * * RESPONSE SUCCESS");
                     TicketCollection collection = response.body();
                     if (!collection.getData().isEmpty()) {
                         Ticket t = collection.getData().get(0);
-                        Log.d(LOG_TAG, "* * * " + t.getDate());
-                        Log.d(LOG_TAG, "* * * " + t.getName());
-                        Log.d(LOG_TAG, "* * * " + t.getAddress());
-                        Log.d(LOG_TAG, "* * * " + t.getDescription());
-                        Log.d(LOG_TAG, "* * * " + t.getCode());
-                        Log.d(LOG_TAG, "* * * " + t.getCodeURL());
                         byte[] imgBytes = new ImageFetcher().getUrlBytes(t.getCodeURL());
                         t.setImageFile(imgBytes);
-                        //printTicket(t);
+                        printTicket(t);
                     }
                 } else {
                     return -1;
@@ -232,9 +220,6 @@ public class MainActivity extends AppCompatActivity {
             service.stop();
             if (code == -1) {
                 Toast.makeText(MainActivity.this, R.string.toast_msg_printing_ticket_error, Toast.LENGTH_SHORT)
-                        .show();
-            } else {
-                Toast.makeText(MainActivity.this, R.string.toast_msg_printing_ticket_success, Toast.LENGTH_SHORT)
                         .show();
             }
         }
