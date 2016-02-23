@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceActivity;
-import android.util.Log;
 
 import io.github.epelde.didactictribble.R;
 
@@ -27,7 +26,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         SharedPreferences sp = getPreferenceScreen().getSharedPreferences();
         sp.registerOnSharedPreferenceChangeListener(this);
         codeEditTextPref = (EditTextPreference) findPreference(CODE_PREF);
-        Log.i("", "* * * VALUE:" + sp.getString(CODE_PREF, DEFAULT_VALUE));
         codeEditTextPref.setSummary(sp.getString(CODE_PREF, DEFAULT_VALUE));
         keyEditTextPref = (EditTextPreference) findPreference(KEY_PREF);
         keyEditTextPref.setSummary(sp.getString(KEY_PREF, DEFAULT_VALUE));

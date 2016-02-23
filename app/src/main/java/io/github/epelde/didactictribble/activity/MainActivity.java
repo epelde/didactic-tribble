@@ -181,6 +181,8 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case BluetoothService.MESSAGE_UNABLE_CONNECT:
                     progress.setVisibility(View.GONE);
+                    Toast.makeText(MainActivity.this, R.string.toast_msg_unable_connect_device, Toast.LENGTH_SHORT)
+                            .show();
                     service.stop();
                     break;
             }
