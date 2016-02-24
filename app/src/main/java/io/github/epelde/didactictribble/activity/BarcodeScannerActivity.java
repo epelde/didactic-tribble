@@ -49,6 +49,10 @@ public class BarcodeScannerActivity extends AppCompatActivity {
     private boolean barcodeScanned = false;
     private boolean previewing = true;
 
+    static {
+        System.loadLibrary("iconv");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

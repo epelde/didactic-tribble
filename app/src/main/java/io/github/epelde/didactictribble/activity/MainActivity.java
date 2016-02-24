@@ -220,7 +220,6 @@ public class MainActivity extends AppCompatActivity {
 
         protected void onPostExecute(Integer code) {
             progress.setVisibility(View.GONE);
-            service.stop();
             if (code == -1) {
                 Toast.makeText(MainActivity.this, R.string.toast_msg_printing_ticket_error, Toast.LENGTH_SHORT)
                         .show();
@@ -236,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
             fos = new FileOutputStream(tempFile);
             fos.write(t.getImageFile());
             fos.flush();
+            fos.close();
             if (tempFile.exists()) {
                 service.sendMessage("--------------------------------\n\n", "GBK");
                 service.write(Commands.PRINT_SPEED);
@@ -265,21 +265,19 @@ public class MainActivity extends AppCompatActivity {
                 pg.drawImage(0, 0, tempFile.getAbsolutePath());
                 service.write(pg.printDraw());
                 service.sendMessage("--------------------------------\n\n", "GBK");
+                byte[] print = new byte[1];
+                cmd[0] = 0x1B;
+                cmd[1] = 0x64;
+                cmd[2] = 0x2;
+                service.write(cmd);
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (tempFile != null && tempFile.exists()) {
-                tempFile.delete();
-            }
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
+        if (tempFile != null) {
+            tempFile.delete();
+        }
+        service.stop();
     }
 
 
